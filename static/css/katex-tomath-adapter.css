@@ -1,0 +1,27 @@
+/*
+ * Hugo transform.ToMath adapter.
+ * Hugo embeds a modified KaTeX that renames some structural classes
+ * (.base -> .katex-base, .strut -> .katex-strut, .sizing -> .katex-sizing)
+ * while the official katex.min.css (loaded from CDN) only targets the
+ * original names. Without the mirror rules below, array rows collapse
+ * and fractions render misaligned. This file re-maps the renamed classes
+ * to the exact same declarations the official CSS applies to the originals.
+ */
+
+.katex .katex-base {
+  position: relative;
+  white-space: nowrap;
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+  display: inline-block;
+}
+
+.katex .katex-strut {
+  display: inline-block;
+}
+
+/* .katex-sizing mirrors .katex .sizing / .fontsize-ensurer (display: inline-block) */
+.katex .katex-sizing {
+  display: inline-block;
+}

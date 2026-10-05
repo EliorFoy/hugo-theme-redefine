@@ -114,9 +114,9 @@ expires: 365                   # 可选，过期提醒（天）
 
 > 嵌套提示：在 tabs/folding/callout 内部再嵌套短代码时，请使用 `{{%/* tabs %}}`（百分号）形态调用，Hugo 会先渲染内部短代码再传入（`{{</* %}}` 形态下嵌套短代码不会被处理）。
 
-## 数学公式（MathJax/LaTeX）
+## 数学公式（KaTeX）
 
-对应 Hexo 的 hexo-filter-mathjax 插件，Hugo 版使用内置 KaTeX 在**构建期**渲染（无运行时 JS、无闪动）：
+对应原站 `markdown-it-katex` + KaTeX CSS 的组合，Hugo 版使用内置 KaTeX 在**构建期**渲染（无运行时 JS、无闪动）：
 
 1. 站点 `hugo.toml` 中启用 passthrough 扩展（markup 配置无法由主题提供默认值，必须写在站点配置）：
 
@@ -128,7 +128,7 @@ inline = [['$', '$'], ['\(', '\)']]
 block = [['\[', '\]'], ['$$', '$$']]
 ```
 
-2. 文章 front matter 中 `mathjax: true`（与 Hexo 用法一致）。
+2. 文章 front matter 中 `mathjax: true`（沿用 Hexo 习惯的键名）。
 3. 行内公式 `$...$` 或 `\(...\)`，块级公式 `$$...$$` 或 `\[...\]`。
 
 KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。

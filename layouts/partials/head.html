@@ -167,32 +167,13 @@
     <link rel="stylesheet" href="{{ "fonts/Geist/geist.css" | relURL }}">
     {{- partial "css-overrides.html" . }}
 
-    {{- /* MathJax plugin (mirrors hexo-filter-mathjax): loaded only on pages
-          containing math; re-typesets after swup navigation. */ -}}
+    {{- /* KaTeX CSS (engine of the original markdown-it-katex setup) plus the
+          adapter for Hugo ToMath's renamed structural classes. Loaded only on
+          pages containing math. */ -}}
     {{- $noop := .WordCount -}}
     {{- if .Store.Get "hasMath" }}
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['\\(', '\\)']],
-                displayMath: [['\\[', '\\]']],
-                processEscapes: false
-            },
-            options: {
-                skippedTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option']
-            },
-            chtml: { displayAlign: 'center' },
-            startup: {
-                typeset: true
-            }
-        };
-        document.addEventListener('swup:page:view', function () {
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                window.MathJax.typesetPromise();
-            }
-        });
-    </script>
-    <script defer id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ "css/katex-tomath.css" | relURL }}">
     {{- end }}
     <!--- Font Part-->
     {{- if $theme.home_banner.custom_font.enable }}
