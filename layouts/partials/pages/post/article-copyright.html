@@ -32,17 +32,17 @@
             {{- if eq $licenseType "custom" }}
                 {{- $ctx.Params.copyright | safeHTML -}}
             {{- else if eq $licenseType "all_rights_reserved" }}
-                {{- i18n "copyright.all_rights_reserved" $author -}}
+                {{- i18n "copyright.all_rights_reserved" $author | safeHTML -}}
             {{- else if eq $licenseType "cc_by" }}
-                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by/4.0\">CC BY 4.0</a>" -}}
+                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by/4.0\">CC BY 4.0</a>" | safeHTML -}}
             {{- else if eq $licenseType "cc_by_sa" }}
-                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-sa/4.0\">CC BY-SA 4.0</a>" -}}
+                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-sa/4.0\">CC BY-SA 4.0</a>" | safeHTML -}}
             {{- else if eq $licenseType "cc_by_nc" }}
-                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-nc/4.0\">CC BY-NC 4.0</a>" -}}
+                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-nc/4.0\">CC BY-NC 4.0</a>" | safeHTML -}}
             {{- else if eq $licenseType "cc_by_nd" }}
-                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-nd/4.0\">CC BY-ND 4.0</a>" -}}
+                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-nd/4.0\">CC BY-ND 4.0</a>" | safeHTML -}}
             {{- else if eq $licenseType "cc_by_nc_sa" }}
-                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-nc-sa/4.0\">CC BY-NC-SA 4.0</a>" -}}
+                {{- i18n "copyright.license_content" "<a class=\"license\" href=\"https://creativecommons.org/licenses/by-nc-sa/4.0\">CC BY-NC-SA 4.0</a>" | safeHTML -}}
             {{- else if eq $licenseType "public_domain" }}
                 {{- i18n "copyright.public_domain" -}}
             {{- end }}
