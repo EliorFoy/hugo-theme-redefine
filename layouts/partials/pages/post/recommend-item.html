@@ -1,0 +1,8 @@
+{{- /* One related-article card. Input: dict item/placeholder */ -}}
+{{- $item := .item -}}
+{{- $placeholder := .placeholder -}}
+{{- $headimg := $item.Params.thumbnail | default $item.Params.banner | default $item.Params.cover | default $placeholder -}}
+<a class="recommended-article-item" href="{{ $item.RelPermalink }}" title="{{ $item.Title }}" rel="bookmark">
+  <img src="{{ partial "url-for.html" $headimg }}" alt="{{ $item.Title }}" class="!max-w-none">
+  <span class="title">{{ $item.Title }}</span>
+</a>

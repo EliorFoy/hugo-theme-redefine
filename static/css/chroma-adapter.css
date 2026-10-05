@@ -1,0 +1,93 @@
+/*
+ * Chroma → Redefine hljs-palette adapter.
+ * Hugo highlights code server-side with Chroma class names (.k, .s, ...).
+ * This file maps them onto the --highlight-* CSS variables defined by the
+ * theme's hljs palette files (css/hljs/hljs-light-*.css / hljs-dark-*.css),
+ * so the configured highlight themes behave exactly like the Hexo original.
+ */
+
+.chroma .k, .chroma .kn, .chroma .kc, .chroma .kd, .chroma .kp,
+.chroma .kr, .chroma .kt, .chroma .kv, .chroma .ow {
+  color: var(--highlight-keyword);
+}
+
+.chroma .nb, .chroma .bp, .chroma .nn {
+  color: var(--highlight-built-in);
+}
+
+/* hljs maps .class/.number to the "number" color */
+.chroma .nc, .chroma .m, .chroma .mb, .chroma .mf, .chroma .mh,
+.chroma .mi, .chroma .mil, .chroma .mo, .chroma .il, .chroma .no,
+.chroma .l {
+  color: var(--highlight-number);
+}
+
+.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .s1,
+.chroma .s2, .chroma .sh, .chroma .si, .chroma .sx, .chroma .sdl,
+.chroma .dl, .chroma .ss, .chroma .ld {
+  color: var(--highlight-string);
+}
+
+.chroma .sr {
+  color: var(--highlight-regexp);
+}
+
+.chroma .se {
+  color: var(--highlight-subst);
+}
+
+/* hljs .function/.title/.params/.subst */
+.chroma .nf, .chroma .fm, .chroma .f, .chroma .ne {
+  color: var(--highlight-subst);
+}
+
+.chroma .c, .chroma .ch, .chroma .cm, .chroma .cp, .chroma .cpf,
+.chroma .c1, .chroma .cs, .chroma .cd {
+  color: var(--highlight-comment);
+  font-style: italic;
+}
+
+.chroma .sd {
+  color: var(--highlight-doctag);
+  font-style: italic;
+}
+
+.chroma .nd, .chroma .nt, .chroma .ni {
+  color: var(--highlight-meta);
+}
+
+.chroma .v, .chroma .vg, .chroma .vi, .chroma .vc, .chroma .vm {
+  color: var(--highlight-variable);
+}
+
+.chroma .na, .chroma .nx, .chroma .py {
+  color: var(--highlight-attr);
+}
+
+.chroma .gh, .chroma .gu {
+  color: var(--highlight-section);
+}
+
+.chroma .ge {
+  font-style: italic;
+}
+
+.chroma .gs {
+  font-weight: bold;
+}
+
+.chroma .gi {
+  color: var(--highlight-addition);
+  display: inline-block;
+  width: 100%;
+}
+
+.chroma .gd {
+  color: var(--highlight-deletion);
+  display: inline-block;
+  width: 100%;
+}
+
+.chroma .ln, .chroma .lnt {
+  color: var(--highlight-gutter-color);
+}

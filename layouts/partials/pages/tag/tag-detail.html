@@ -1,0 +1,9 @@
+{{- /* Single tag page — port of pages/tag/tag-detail.ejs (kind=term). Input: dict ctx/paginator */ -}}
+{{- $ctx := .ctx -}}
+{{- $posts := $ctx.Pages -}}
+<div class="tag-name">
+    <i class="fa-solid fa-tag"></i>&nbsp;{{ $ctx.Title }}
+</div>
+<div class="tag-post-list">
+    {{- partial "utils/posts-list.html" (dict "ctx" $ctx "posts" ($posts.ByDate.Reverse)) }}
+</div>

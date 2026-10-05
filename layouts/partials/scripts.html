@@ -1,0 +1,43 @@
+{{- $theme := site.Params -}}
+{{- $jsBase := cond $theme.developer.enable "js/" "js/build/" }}
+<script type="module" src="{{ (printf "%smain.js" $jsBase) | relURL }}"></script>
+
+{{- if $theme.footer.runtime }}
+    <script src="{{ (printf "%slibs/odometer.min.js" $jsBase) | relURL }}"></script>
+    <link rel="stylesheet" href="{{ "assets/odometer-theme-minimal.css" | relURL }}">
+{{- end }}
+
+{{- $subtitleConfig := $theme.home_banner.subtitle | default dict -}}
+{{- $subtitleText := $subtitleConfig.text -}}
+{{- $subtitleEntries := slice -}}
+{{- if $subtitleText -}}
+  {{- if eq (printf "%T" $subtitleText) "string" }}{{ $subtitleEntries = slice $subtitleText }}
+  {{- else }}{{ $subtitleEntries = $subtitleText }}{{ end -}}
+{{- end -}}
+{{- $needTyped := false -}}
+{{- if gt (len $subtitleEntries) 0 }}{{ $needTyped = true }}{{ end -}}
+{{- if and $subtitleConfig.hitokoto $subtitleConfig.hitokoto.enable }}{{ $needTyped = true }}{{ end -}}
+{{- if $needTyped }}
+    <script src="{{ (printf "%slibs/Typed.min.js" $jsBase) | relURL }}"></script>
+{{- end }}
+
+{{- if $theme.plugins.mermaid.enable }}
+    {{- if eq $theme.plugins.mermaid.version "11.4.1" }}
+        <script src="{{ (printf "%slibs/mermaid.min.js" $jsBase) | relURL }}"></script>
+    {{- else }}
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@{{ $theme.plugins.mermaid.version }}/dist/mermaid.min.js"></script>
+    {{- end }}
+{{- end }}
+
+{{- $isMasonryPage := false -}}
+{{- $pd := partial "page-data.html" . -}}
+{{- if and $pd (eq $pd.partial "pages/masonry/masonry") }}{{ $isMasonryPage = true }}{{ end -}}
+{{- if or $isMasonryPage (hugo.Data.masonry) (hugo.Data.gallery) (hugo.Data.photos) }}
+    <script{{ if $theme.global.single_page }} data-swup-reload-script{{ end }} src="{{ (printf "%slibs/minimasonry.min.js" $jsBase) | relURL }}"></script>
+{{- end }}
+
+<script{{ if $theme.global.single_page }} data-swup-reload-script{{ end }} src="{{ (printf "%slibs/moment-with-locales.min.js" $jsBase) | relURL }}"></script>
+{{- if $theme.articles.pangu_js }}
+    <script src="{{ (printf "%slibs/pangu.min.js" $jsBase) | relURL }}"></script>
+{{- end }}
+{{- $ctx := . -}}

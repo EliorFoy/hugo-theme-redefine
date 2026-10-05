@@ -1,0 +1,20 @@
+{{- /* Categories list page — port of pages/category/categories.ejs. Input: dict ctx/paginator */ -}}
+{{- $ctx := .ctx -}}
+{{- $title := $ctx.Title | default (i18n "categories") -}}
+<h1 class="page-title-header">
+	{{- $title -}}
+</h1>
+<div class="category-list-content">
+	<ul class="all-category-list">
+		{{- range $name, $term := site.Taxonomies.categories }}
+		<li class="all-category-list-item">
+			<a class="all-category-list-link" href="{{ partial "url-for.html" (site.Params.category_dir | default "categories") }}/{{ $name | urlize }}/">{{ $term.Page.LinkTitle }}</a>
+			<span class="all-category-list-count">{{ len $term }}</span>
+		</li>
+		{{- end }}
+	</ul>
+</div>
+<div class="category-comments">
+	{{- if $ctx.Params.comment }} {{- partial "components/comments/comment.html" $ctx }}
+	{{- end }}
+</div>

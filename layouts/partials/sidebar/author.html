@@ -1,0 +1,9 @@
+{{- $theme := site.Params -}}
+{{- $author := $theme.info.author | default site.Params.author | default site.Title -}}
+{{- $posts := partial "posts.html" . -}}
+<div class="author flex flex-col justify-center my-2.5 mx-0">
+    <div class="name">{{ $author }}</div>
+    {{- if $theme.articles.author_label.enable }}
+        <div class="label">{{ partial "get-author-label.html" (dict "postCount" (len $posts) "auto" $theme.articles.author_label.auto "list" $theme.articles.author_label.list) }}</div>
+    {{- end }}
+</div>

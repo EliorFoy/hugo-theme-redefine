@@ -1,0 +1,70 @@
+{{- /*
+  Main page shell — port of layout/page.ejs
+  Input: dict with "ctx" (the page), "partial" (content partial name),
+         and optionally "paginator" (home pagination object)
+*/ -}}
+{{- $ctx := .ctx -}}
+{{- $contentPartial := .partial -}}
+{{- $paginator := .paginator -}}
+{{- $theme := site.Params -}}
+{{- $isHome := $ctx.IsHome -}}
+{{- $isFirstPage := true -}}
+{{- if $paginator }}{{ $isFirstPage = not $paginator.HasPrev }}{{ end -}}
+{{- $isPost := partial "is-post.html" $ctx -}}
+{{- partial "header/progress-bar.html" . -}}
+{{- if $theme.global.preloader.enable }}
+{{- partial "header/preloader.html" . }}
+{{- end }}
+<main class="page-container" id="swup">
+
+	{{- if and $theme.home_banner.enable $isHome $isFirstPage }}
+	{{- partial "pages/home/home-banner.html" . }}
+	{{- else if and $theme.home_banner.enable $isHome (not $isFirstPage) (eq $theme.home_banner.style "fixed") }}
+	{{- partial "pages/home/home-background.html" . }}
+	{{- end }}
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			{{- partial "header/navbar.html" . }}
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			{{- if and $isHome $theme.home.sidebar.enable (eq $theme.home.sidebar.position "left") }}
+			{{- partial "pages/home/home-sidebar.html" . }}
+			{{- end }}
+
+			<div class="main-content">
+				{{- partial $contentPartial (dict "ctx" $ctx "paginator" $paginator) }}
+			</div>
+
+			{{- if and $isHome $theme.home.sidebar.enable (eq $theme.home.sidebar.position "right") }}
+			{{- partial "pages/home/home-sidebar.html" . }}
+			{{- end }}
+		</div>
+
+		<div class="main-content-footer">
+			{{- partial "footer/footer.html" . }}
+		</div>
+	</div>
+
+	{{- if $isPost }}
+	<div class="post-tools">
+		{{- partial "pages/post/post-tools.html" . }}
+	</div>
+	{{- end }}
+
+	<div class="right-side-tools-container">
+		{{- partial "utils/side-tools.html" . }}
+	</div>
+
+	{{- partial "utils/image-viewer.html" . }}
+
+	{{- if $theme.navbar.search.enable }}
+	{{- partial "utils/local-search.html" . }}
+	{{- end }}
+
+</main>
+
+{{- if $theme.global.single_page }}
+{{- partial "swup.html" . }}
+{{- end }}

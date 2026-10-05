@@ -1,0 +1,20 @@
+{{/*
+  Returns the content partial path for a page — port of getPagePartialPath.
+  Input: a page.
+*/}}
+{{- $page := . -}}
+{{- if $page.IsHome -}}
+  {{- return "pages/home/home-content" -}}
+{{- end -}}
+{{- if partial "is-post.html" $page -}}
+  {{- return "pages/post/article-content" -}}
+{{- end -}}
+{{- $data := partialCached "page-data.html" $page $page.Path $page.Title $page.Params.layout $page.Params.type -}}
+{{- if $data -}}
+  {{- if eq $data.layout "raw" -}}
+    {{- return $data.partial -}}
+  {{- else -}}
+    {{- return "pages/page-template" -}}
+  {{- end -}}
+{{- end -}}
+{{- return "pages/page-template" -}}

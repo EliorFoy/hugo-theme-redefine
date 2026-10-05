@@ -1,0 +1,157 @@
+# Example site for hugo-theme-redefine
+baseURL = "https://redefine.example.com/"
+title = "Theme Redefine"
+subtitle = "Redefine Your Hugo Journey."
+theme = "hugo-theme-redefine"
+themesDir = "../.."
+
+defaultContentLanguage = "zh-cn"
+hasCJKLanguage = true
+
+[pagination]
+pagerSize = 5
+
+# >>> 直接从主题 hugo.toml 继承的必要配置（markup/outputs 建议在站点配置中声明） >>>
+[markup]
+defaultMarkdownHandler = "goldmark"
+[markup.highlight]
+codeFences = true
+noClasses = false
+lineNos = true
+lineNumbersInTable = true
+[markup.goldmark.renderer]
+unsafe = true
+[markup.tableOfContents]
+startLevel = 1
+endLevel = 6
+
+[outputs]
+home = ["HTML", "Search"]
+
+[outputFormats.MasonryData]
+mediaType = "application/json"
+baseName = "data"
+
+[taxonomies]
+tag = "tags"
+category = "categories"
+
+[related]
+includeNewer = false
+threshold = 4
+toLower = true
+[[related.indices]]
+name = "tags"
+weight = 100
+[[related.indices]]
+name = "categories"
+weight = 80
+[[related.indices]]
+name = "keywords"
+weight = 60
+
+[params]
+date_format = "YYYY-MM-DD"
+time_format = "HH:mm:ss"
+
+[params.info]
+# title/author 留空时回退到站点 title/copyright
+subtitle = "Redefine Your Hugo Journey."
+
+[params.colors]
+primary = "#A31F34"
+default_mode = "light"
+
+[params.global]
+content_max_width = "1000px"
+single_page = true
+
+[params.global.website_counter]
+enable = true
+site_pv = true
+site_uv = true
+post_pv = true
+
+[params.home_banner]
+enable = true
+style = "fixed"
+title = "Theme Redefine"
+
+[params.home_banner.subtitle]
+text = ["一个从 Hexo 完整迁移到 Hugo 的主题", "支持暗色模式、本地搜索、代码高亮"]
+typing_speed = 100
+backing_speed = 80
+starting_delay = 500
+backing_delay = 1500
+loop = true
+smart_backspace = true
+[params.home_banner.subtitle.hitokoto]
+enable = false
+
+[params.navbar]
+auto_hide = false
+
+[params.navbar.links]
+[params.navbar.links.Archives]
+path = "/archives/"
+icon = "fa-regular fa-archive"
+[params.navbar.links.Tags]
+path = "/tags/"
+icon = "fa-regular fa-tags"
+[params.navbar.links.About]
+path = "/about/"
+icon = "fa-regular fa-user"
+
+[params.navbar.search]
+enable = true
+preload = true
+
+[params.home.sidebar]
+enable = true
+position = "left"
+first_item = "menu"
+show_on_mobile = true
+
+[params.home.sidebar.links]
+[params.home.sidebar.links.Categories]
+path = "/categories/"
+icon = "fa-regular fa-folder"
+
+[params.articles]
+lazyload = true
+
+[params.articles.style]
+image_caption = false
+delete_mask = false
+title_alignment = "left"
+
+[params.articles.code_block]
+copy = true
+style = "mac"
+[params.articles.code_block.highlight_theme]
+light = "github"
+dark = "vs2015"
+
+[params.articles.toc]
+enable = true
+max_depth = 3
+number = false
+
+[params.articles.copyright]
+enable = true
+default = "cc_by_nc_sa"
+
+[params.comment]
+enable = false
+system = ""
+
+[params.footer]
+runtime = false
+statistics = true
+start = "2024/1/1 00:00:00"
+
+[params.page_templates]
+tags_style = "blur"
+
+[params.articles.recommendation]
+enable = false

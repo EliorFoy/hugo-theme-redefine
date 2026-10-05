@@ -1,0 +1,28 @@
+{{/*
+  Converts a hex color to rgb()/rgba() with optional lighten and alpha.
+  Input: dict { color "#rrggbb", alpha 0..1 (optional), lighten 0..1 (optional) }
+  Returns e.g. "rgba(163,31,52,0.21)"
+*/}}
+{{- $color := string (.color | default "#000000") -}}
+{{- $alpha := .alpha -}}
+{{- $lighten := .lighten -}}
+{{- $c := strings.TrimPrefix "#" $color -}}
+{{- if eq (len $c) 3 -}}
+  {{- $c = printf "%s%s%s%s%s%s" (substr $c 0 1) (substr $c 0 1) (substr $c 1 1) (substr $c 1 1) (substr $c 2 1) (substr $c 2 1) -}}
+{{- end -}}
+{{- $hexmap := dict -}}
+{{- range $i := seq 0 255 -}}{{ $hexmap = merge $hexmap (dict (printf "%02x" $i) $i) }}{{- end -}}
+{{- $r := index $hexmap (substr $c 0 2) -}}
+{{- $g := index $hexmap (substr $c 2 2) -}}
+{{- $b := index $hexmap (substr $c 4 2) -}}
+{{- if $lighten -}}
+  {{- $l := float $lighten -}}
+  {{- $r = math.Round (add (float $r) (mul (sub 255.0 (float $r)) $l)) -}}
+  {{- $g = math.Round (add (float $g) (mul (sub 255.0 (float $g)) $l)) -}}
+  {{- $b = math.Round (add (float $b) (mul (sub 255.0 (float $b)) $l)) -}}
+{{- end -}}
+{{- if $alpha -}}
+  {{- return (printf "rgba(%d,%d,%d,%s)" $r $g $b (div (float $alpha) 255.0)) -}}
+{{- else -}}
+  {{- return (printf "rgb(%d,%d,%d)" $r $g $b) -}}
+{{- end -}}

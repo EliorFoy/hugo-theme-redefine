@@ -1,0 +1,7 @@
+{{/*
+  Formats a time with the site date/time format (moment.js tokens supported).
+  Usage: {{ partial "date-fmt.html" (dict "t" .Date "fmt" $fmt) }}
+*/}}
+{{- $t := .t -}}
+{{- $fmt := .fmt | default (site.Params.date_format | default "YYYY-MM-DD") -}}
+{{- return (time.Format (partial "moment-layout.html" $fmt) $t) -}}

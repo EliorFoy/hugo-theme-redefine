@@ -1,0 +1,20 @@
+{{- /* Paginator — port of utils/paginator.ejs. Input: dict ctx/paginator */ -}}
+{{- $paginator := .paginator -}}
+{{- if $paginator -}}
+{{- $base := site.BaseURL | relURL -}}
+<div class="paginator">
+	{{- with $paginator.Prev }}
+	<a class="prev" href="{{ $base }}page/{{ .PageNumber }}/" title="prev"><i class="fa-regular fa-angle-left"></i></a>
+	{{- end }}
+	{{- range $n := seq 1 $paginator.TotalPages }}
+		{{- if eq $n $paginator.PageNumber }}
+	<span class="page-number current">{{ $n }}</span>
+		{{- else }}
+	<a class="page-number" href="{{ if eq $n 1 }}{{ $base }}{{ else }}{{ $base }}page/{{ $n }}/{{ end }}">{{ $n }}</a>
+		{{- end }}
+	{{- end }}
+	{{- with $paginator.Next }}
+	<a class="next" href="{{ $base }}page/{{ .PageNumber }}/" title="next"><i class="fa-regular fa-angle-right"></i></a>
+	{{- end }}
+</div>
+{{- end }}

@@ -1,0 +1,19 @@
+{{- /*
+  Code block render hook — reproduces the Hexo highlight markup the theme's
+  CSS and JS expect (.code-container > figure.highlight > table with
+  td.gutter / td.code), backed by Hugo's Chroma highlighter.
+*/ -}}
+{{- $lang := string .Type | default "code" -}}
+{{- if eq $lang "plain" }}{{ $lang = "code" }}{{ end -}}
+{{- if eq $lang "mermaid" -}}
+<pre class="mermaid">{{ .Inner }}</pre>
+{{- else -}}
+{{- $result := transform.Highlight (strings.TrimSuffix "\n" .Inner) $lang (dict "noClasses" false "lineNos" true "lineNumbersInTable" true) -}}
+{{- $rel := $lang -}}
+{{- if gt (len $lang) 0 }}{{ $rel = printf "%s%s" (upper (substr $lang 0 1)) (substr $lang 1) }}{{ end -}}
+{{- $result = replaceRE `^<div class="highlight">` (printf `<div class="code-container" data-rel="%s"><figure class="highlight %s">` $rel $lang) $result -}}
+{{- $result = replaceRE `<table class="lntable"><tr><td class="lntd">` `<table class="lntable"><tr><td class="gutter">` $result -}}
+{{- $result = replaceRE `<td class="lntd">` `<td class="code">` $result -}}
+{{- $result = replaceRE `(</table>\s*)</div>\s*</div>\s*$` "$1</figure>\n</div>" $result -}}
+{{- $result | safeHTML -}}
+{{- end -}}

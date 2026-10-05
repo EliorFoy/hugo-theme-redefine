@@ -1,0 +1,53 @@
+{{- /* One home page article card. Input: dict ctx/post */ -}}
+{{- $ctx := .ctx -}}
+{{- $post := .post -}}
+{{- $theme := site.Params -}}
+<li class="home-article-item">
+
+    {{- if $post.Params.sticky }}
+        <div class="absolute top-[12px] right-[12px] text-[0.7rem] text-third-text-color rounded-medium bg-background-color-transparent-15 backdrop-blur-sm py-[2px] px-[10px] border border-border-color z-3 hover:text-first-text-color cursor-default">
+            <i class="fa-regular fa-thumbtack mr-[3px] text-[0.65rem]"></i>{{- i18n "sticky" -}}
+        </div>
+    {{- end }}
+
+    {{- $articleThumbnail := "" -}}
+    {{- $hasThumbnail := false -}}
+    {{- with $post.Params.thumbnail }}
+        {{- if ne (string .) "false" }}{{ $articleThumbnail = . }}{{ $hasThumbnail = true }}{{ end }}
+    {{- else }}
+        {{- if $post.Params.cover }}{{ $articleThumbnail = $post.Params.cover }}{{ $hasThumbnail = true }}
+        {{- else if $post.Params.banner }}{{ $articleThumbnail = $post.Params.banner }}{{ $hasThumbnail = true }}{{ end }}
+    {{- end }}
+    {{- if and $hasThumbnail (not (strings.Contains $articleThumbnail "/")) }}
+        {{- /* asset-style path without a slash: resolve relative to the post bundle */ -}}
+        {{- $articleThumbnail = path.Join ($post.RelPermalink | strings.TrimSuffix "/") $articleThumbnail -}}
+    {{- end }}
+
+    {{- if and (ne (string $post.Params.thumbnail) "false") $hasThumbnail }}
+        <div id="home-article-thumbnail" class="home-article-thumbnail relative h-[150px] overflow-hidden rounded-t-large">
+            <a href="{{ $post.RelPermalink }}">
+                <img src="{{ partial "url-for.html" $articleThumbnail }}" alt="{{ $post.Title }}" class="w-full h-full object-cover dark:brightness-75 transition-all" />
+            </a>
+        </div>
+    {{- end }}
+    <div class="flex flex-col gap-5 px-7 pb-7 {{ if and (ne (string $post.Params.thumbnail) "false") $hasThumbnail }}pt-5{{ else }}pt-7{{ end }}">
+        <h3 class="home-article-title">
+            <a href="{{ $post.RelPermalink }}">
+                {{ $post.Title }}
+            </a>
+        </h3>
+
+        <div class="home-article-content markdown-body">
+            {{- $excerptParam := string ($post.Params.excerpt | default "") -}}
+            {{- if eq $excerptParam "false" }}
+            {{- else if and (ne $excerptParam "") (ne $excerptParam "false") }}
+                {{- $post.RenderString $excerptParam -}}
+            {{- else }}
+                {{- $excerptLength := int ($theme.home.excerpt_length | default 200) -}}
+                {{- truncate $excerptLength $post.Plain | htmlUnescape | safeHTML -}}
+            {{- end }}
+        </div>
+
+        {{- partial "pages/home/home-article.html" (dict "ctx" $ctx "post" $post) }}
+    </div>
+</li>

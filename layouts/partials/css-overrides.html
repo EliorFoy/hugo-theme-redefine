@@ -1,0 +1,80 @@
+{{/*
+  Runtime CSS overrides for config-driven values — the Hexo theme baked these
+  into Stylus at compile time; here they are generated from Hugo params.
+  Loaded AFTER css/style.css.
+*/ -}}
+{{- $theme := site.Params -}}
+{{- $primary := $theme.colors.primary | default "#0066CC" -}}
+{{- $navLeft := $theme.navbar.color.left -}}
+{{- $navRight := $theme.navbar.color.right -}}
+{{- $navAlpha := int ($theme.navbar.color.transparency | default 35) -}}
+{{- $contentMax := partial "css-size.html" ($theme.global.content_max_width | default "1000px") -}}
+{{- $navHome := partial "css-size.html" ($theme.navbar.width.home | default "1200px") -}}
+{{- $navPages := partial "css-size.html" ($theme.navbar.width.pages | default "1000px") -}}
+{{- $tocWidth := partial "css-size.html" ($theme.global.sidebar_width | default "210px") -}}
+{{- $font := $theme.articles.style -}}
+{{- $imgRadius := partial "css-size.html" ($font.image_border_radius | default "14px") -}}
+{{- $engFont := "Geist Variable" -}}
+{{- if and $theme.global.fonts.english.enable $theme.global.fonts.english.family }}{{ $engFont = $theme.global.fonts.english.family }}{{ end -}}
+{{- $chnFont := "PingFang SC" -}}
+{{- if and $theme.global.fonts.chinese.enable $theme.global.fonts.chinese.family }}{{ $chnFont = $theme.global.fonts.chinese.family }}{{ end -}}
+{{- $customFonts := or (and $theme.global.fonts.english.enable $theme.global.fonts.english.family) (and $theme.global.fonts.chinese.enable $theme.global.fonts.chinese.family) -}}
+<style id="redefine-config-overrides">
+:root, .light, .dark {
+  --primary-color: {{ $primary }};
+  --selection-color: {{ partial "css-color.html" (dict "color" $primary "lighten" 0.1) }};
+  --home-banner-text-color: {{ $theme.home_banner.text_color.light | default "#fff" }};
+}
+.dark {
+  --home-banner-text-color: {{ $theme.home_banner.text_color.dark | default "#d1d1b6" }};
+}
+{{- $navRightVal := $navRight -}}
+{{- if not $navRightVal }}{{ $navRightVal = $navLeft }}{{ end -}}
+{{- if $navLeft }}
+.navbar-container {
+  background: linear-gradient(120deg, {{ partial "css-color.html" (dict "color" $navLeft "alpha" $navAlpha) }} 0%, {{ partial "css-color.html" (dict "color" $navRightVal "alpha" $navAlpha) }} 100%);
+}
+{{- end }}
+.page-container .main-content-container .main-content-body .main-content {
+  max-width: {{ $contentMax.value }}{{ $contentMax.unit }};
+}
+.page-container .main-content-container .main-content-body .main-content.has-toc {
+  max-width: {{ mul $contentMax.value 1.2 }}{{ $contentMax.unit }} !important;
+}
+.navbar-container .navbar-content {
+  max-width: {{ $navPages.value }}{{ $navPages.unit }};
+}
+html.is-animating .transition-navbar {
+  max-width: {{ $navPages.value }}{{ $navPages.unit }} !important;
+}
+.navbar-container .navbar-content.has-home-banner {
+  max-width: {{ $navHome.value }}{{ $navHome.unit }};
+}
+.post-page-container.show-toc .toc-content-container {
+  width: {{ $tocWidth.value }}{{ $tocWidth.unit }};
+}
+{{- range $h := slice "h1" "h2" "h3" "h4" "h5" "h6" }}
+  {{- $v := index $font.headings_top_spacing $h -}}
+  {{- if $v }}
+.markdown-body {{ $h }}:not(.not-markdown),
+.markdown-body .{{ $h }}:not(.not-markdown) {
+  margin-top: {{ $v }};
+}
+  {{- end }}
+{{- end }}
+.markdown-body {
+  font-size: {{ $font.font_size | default "16px" }};
+  line-height: {{ $font.line_height | default 1.5 }};
+}
+html, body {
+  line-height: {{ $font.line_height | default 1.5 }};
+}
+.markdown-body img:not(.not-markdown) {
+  border-radius: {{ $imgRadius.value }}{{ $imgRadius.unit }};
+}
+{{- if $customFonts }}
+.markdown-body, .post-toc, .home-article-title {
+  font-family: '{{ $engFont }}', '{{ $chnFont }}', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif;
+}
+{{- end }}
+</style>

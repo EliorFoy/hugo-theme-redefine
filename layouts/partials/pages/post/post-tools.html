@@ -1,0 +1,19 @@
+{{- /* Post tools — port of pages/post/post-tools.ejs */ -}}
+{{- $theme := site.Params -}}
+<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		{{- if $theme.articles.toc.enable }}
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		{{- end }}
+
+		<!-- go comment -->
+		{{- if and $theme.comment.enable (ne $theme.comment.system "") (ne (.Params.comment | default true) false) }}
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		{{- end }}
+	</ul>
+</div>

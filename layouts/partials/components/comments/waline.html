@@ -1,0 +1,55 @@
+{{- $theme := site.Params -}}
+{{- $w := $theme.comment.config.waline -}}
+{{- if and (eq $theme.comment.system "waline") $w.serverUrl $w.lang }}
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '{{ "js/build/libs/waline.js" | relURL }}';
+
+      (function() {
+        const startPath = location.pathname;
+        const startTime = Date.now();
+        const retryDelay = 200;
+        const retryLimit = 5000;
+
+        const runWaline = () => {
+          if (location.pathname !== startPath) {
+            return;
+          }
+
+          const container = document.getElementById('waline');
+          if (!container) {
+            if (Date.now() - startTime < retryLimit) {
+              setTimeout(runWaline, retryDelay);
+            }
+            return;
+          }
+
+          if (window.redefineWalineInstance?.destroy) {
+            window.redefineWalineInstance.destroy();
+          }
+
+          container.innerHTML = '';
+          window.redefineWalineInstance = init({
+            el: '#waline',
+            serverURL: '{{ $w.serverUrl }}',
+            path: location.pathname,
+            dark: 'body[class~="dark-mode"]',
+            reaction: {{ if $w.reaction }}true{{ else }}false{{ end }},
+            requiredMeta: ['nick', 'mail'],
+            emoji: {{ $w.emoji | default slice | jsonify }},
+            {{- with $w.lang }}          lang: '{{ . }}',{{ end }}
+            {{- with $w.locale }}          locale: {{ . | jsonify }},{{ end }}
+            {{- with $w.login }}          login: '{{ . }}',{{ end }}
+            {{- with $w.wordLimit }}          wordLimit: {{ . }},{{ end }}
+            {{- with $w.pageSize }}          pageSize: {{ . }},{{ end }}
+            {{- with $w.commentSorting }}          commentSorting: '{{ . }}',{{ end }}
+            {{- with $w.meta }}          meta: {{ . | jsonify }},{{ end }}
+            {{- with $w.recaptchaV3Key }}          recaptchaV3Key: '{{ . }}',{{ end }}
+            {{- with $w.turnstileKey }}          turnstileKey: '{{ . }}',{{ end }}
+          });
+        };
+
+        runWaline();
+      })();
+    </script>
+{{- end }}

@@ -1,0 +1,8 @@
+{{/*
+  CJK-aware word count, approximates hexo-wordcount behaviour.
+  Input: a page. Returns the word count.
+*/}}
+{{- $text := .Plain -}}
+{{- $cjk := strings.RuneCount (replaceRE "[^\\p{Han}\\p{Hiragana}\\p{Katakana}\\p{Hangul}]" "" $text) -}}
+{{- $words := len (findRE "[A-Za-z0-9]+(?:['\\-_][A-Za-z0-9]+)*" $text) -}}
+{{- return (add $cjk $words) -}}

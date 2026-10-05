@@ -1,0 +1,10 @@
+{{/*
+  Normalizes a social icon value (port of normalizeIcon in home-banner.ejs).
+  Input: dict "icon", "name"
+*/}}
+{{- $source := .icon | default .name | default "" -}}
+{{- if not $source }}{{ return "" }}{{ end -}}
+{{- if eq $source "email" }}{{ return "fa-solid fa-at" }}{{ end -}}
+{{- if or (strings.HasPrefix $source "/") (strings.HasPrefix $source "http") }}{{ return $source }}{{ end -}}
+{{- if strings.Contains $source "fa-" }}{{ return $source }}{{ end -}}
+{{- return (printf "fa-brands fa-%s" $source) -}}

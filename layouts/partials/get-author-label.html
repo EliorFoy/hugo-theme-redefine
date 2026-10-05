@@ -1,0 +1,21 @@
+{{/*
+  Author label, port of getAuthorLabel helper.
+  Input: dict with "postCount", "auto", "list"
+*/}}
+{{- $postCount := int .postCount -}}
+{{- $isAuto := .auto -}}
+{{- $list := .list | default slice -}}
+{{- $level := 1 -}}
+{{- if gt $postCount 0 -}}
+  {{- $level = math.Floor (div (math.Log (float $postCount)) (math.Log 2)) -}}
+  {{- if lt $level 2 }}{{ $level = 1 }}{{ else }}{{ $level = sub $level 1 }}{{ end -}}
+{{- end -}}
+{{- $label := printf "Lv%d" $level -}}
+{{- if and (not $isAuto) (gt (len $list) 0) -}}
+  {{- if gt $level (len $list) -}}
+    {{- $label = index $list (sub (len $list) 1) -}}
+  {{- else -}}
+    {{- $label = index $list (sub $level 1) -}}
+  {{- end -}}
+{{- end -}}
+{{- return $label -}}

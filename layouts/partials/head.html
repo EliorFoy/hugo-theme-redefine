@@ -1,0 +1,208 @@
+{{- $theme := site.Params -}}
+{{- $title := site.Title -}}
+{{- if $theme.info.title }}{{ $title = $theme.info.title }}{{ end }}
+{{- $subtitle := site.Params.subtitle | default site.Params.description -}}
+{{- if $theme.info.subtitle }}{{ $subtitle = $theme.info.subtitle }}{{ end }}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{- $keywords := .Params.keywords | default $theme.keywords | default $theme.info.keywords }}
+    {{- if not $keywords }}{{ $keywords = "Hugo Theme Redefine" }}{{ end }}
+    <meta name="keywords" content="{{ $keywords }}">
+    {{- $ogConfig := $theme.global.open_graph }}
+    {{- $ogEnabled := false }}
+    {{- if $ogConfig }}{{ $ogEnabled = $ogConfig.enable }}{{ end }}
+    {{- if not $ogEnabled }}
+    <meta name="description" content="{{ .Description | default $theme.global.open_graph.description | default site.Params.description | default "Hugo Theme Redefine" }}">
+    {{- end }}
+    {{- $author := $theme.info.author | default site.Copyright }}
+    <meta name="author" content="{{ $theme.info.author | default site.Params.author | default "Redefine Team" }}">
+
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+
+            // Set body classes ASAP (before DOMContentLoaded)
+            (function() {
+                const addBodyClass = () => {
+                    const b = document.body;
+                    if (!b) return false;
+                    b.classList.add(theme + "-mode");
+                    return true;
+                };
+
+                // Try immediately
+                if (addBodyClass()) return;
+
+                // Observe until body exists
+                const mo = new MutationObserver(() => {
+                    if (addBodyClass()) mo.disconnect();
+                });
+                mo.observe(document.documentElement, { childList: true, subtree: true });
+            })();
+        })();
+    </script>
+
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    {{- if $theme.cdn.enable }}
+    {{- $cdnLinks := dict "jsdelivr" "https://cdn.jsdelivr.net" "unpkg" "https://unpkg.com" "aliyun" "https://evan.beee.top" "cdnjs" "https://cdnjs.cloudflare.com" "zstatic" "https://s4.zstatic.net" "npmmirror" "https://registry.npmmirror.com" }}
+    {{- with index $cdnLinks $theme.cdn.provider }}
+    <link rel="preconnect" href="{{ . }}" crossorigin>
+    {{- end }}
+    {{- end }}
+    <!--- Seo Part-->
+    {{- partial "generate-meta.html" . }}
+    {{- if .Permalink }}
+    <link rel="canonical" href="{{ .Permalink | lower }}">
+    {{- end }}
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+
+    {{- if $ogEnabled }}
+    {{- partial "open-graph.html" (dict "ctx" . "ogConfig" $ogConfig "title" $title) }}
+    {{- end }}
+    {{- if $theme.global.google_analytics.enable }}
+    <!-- Google tag (gtag.js) -->
+    <script src="https://www.googletagmanager.com/gtag/js?id={{ $theme.global.google_analytics.id }}"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '{{ $theme.global.google_analytics.id }}');
+    </script>
+    {{- end }}
+    <!--- Icon Part-->
+    {{- $favicon := $theme.defaults.favicon }}
+    <link rel="icon" type="image/png" href="{{ partialCached "url-for.html" $favicon $favicon }}" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ partialCached "url-for.html" $favicon $favicon }}">
+    <meta name="theme-color" content="{{ $theme.colors.primary }}">
+    <!--- Page Info-->
+    {{- $pageTitle := "" }}
+    {{- if .IsHome }}
+        {{- $pageTitle = "" }}
+    {{- else if .IsPage }}
+        {{- if .Title }}{{ $pageTitle = i18n (lower .Title) | default .Title }}{{ end }}
+    {{- else if eq .Kind "term" }}
+        {{- if eq .Data.Singular "category" }}{{ $pageTitle = printf "%s: %s" (i18n "category") .Title }}
+        {{- else }}{{ $pageTitle = printf "%s: %s" (i18n "tag") .Title }}{{ end }}
+    {{- else if eq .Kind "taxonomy" }}
+        {{- $pageTitle = i18n .Data.Plural | default .Title }}
+    {{- else if .Title }}
+        {{- $pageTitle = i18n (lower .Title) | default .Title }}
+    {{- end }}
+    <title>
+        {{- if $pageTitle }}
+            {{ $pageTitle }} | {{ $title }}
+        {{- else }}
+            {{ $title }}{{ with $subtitle }} - {{ . }}{{ end }}
+        {{- end }}
+    </title>
+
+    <link rel="stylesheet" href="{{ "fonts/Chillax/chillax.css" | relURL }}">
+
+    <!--- Inject Part-->
+    {{- if $theme.inject.enable }}
+        {{- range $theme.inject.head }}
+            {{- if . }}
+                {{- if $theme.global.single_page }}
+                    {{- replace . "<script" "<script data-swup-reload-script" | safeHTML }}
+                {{- else }}
+                    {{- . | safeHTML }}
+                {{- end }}
+            {{- end }}
+        {{- end }}
+    {{- end }}
+
+    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+
+    <link rel="stylesheet" href="{{ printf "css/hljs/hljs-light-%s.css" ($theme.articles.code_block.highlight_theme.light | default "github") | relURL }}">
+    <link rel="stylesheet" href="{{ printf "css/hljs/hljs-dark-%s.css" ($theme.articles.code_block.highlight_theme.dark | default "vs2015") | relURL }}">
+    <link rel="stylesheet" href="{{ "css/chroma-adapter.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "css/build/tailwind.css" | relURL }}">
+
+    <link rel="stylesheet" href="{{ "fonts/GeistMono/geist-mono.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "fonts/Geist/geist.css" | relURL }}">
+    {{- partial "css-overrides.html" . }}
+    <!--- Font Part-->
+    {{- if $theme.home_banner.custom_font.enable }}
+    <link href="{{ $theme.home_banner.custom_font.url }}" rel="stylesheet">
+    {{- end }}
+    {{- if $theme.articles.code_block.font.enable }}
+    <link href="{{ $theme.articles.code_block.font.url }}" rel="stylesheet">
+    {{- end }}
+    {{- if $theme.global.fonts.chinese.enable }}
+    <link href="{{ $theme.global.fonts.chinese.url }}" rel="stylesheet">
+    {{- end }}
+    {{- if $theme.global.fonts.english.enable }}
+    <link href="{{ $theme.global.fonts.english.url }}" rel="stylesheet">
+    {{- end }}
+    {{- if $theme.global.fonts.title.enable }}
+    <link href="{{ $theme.global.fonts.title.url }}" rel="stylesheet">
+    {{- end }}
+    {{- if $theme.global.preloader.enable }}
+    <script src="{{ "js/build/libs/anime.min.js" | relURL }}"></script>
+    {{- end }}
+
+    {{- partial "export-config.html" . }}
+
+    <!--- Fontawesome Part-->
+    <link rel="stylesheet" href="{{ "fontawesome/fontawesome.min.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "fontawesome/brands.min.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "fontawesome/solid.min.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "fontawesome/regular.min.css" | relURL }}">
+    {{- if $theme.fontawesome.thin }}
+    <link rel="stylesheet" href="{{ "fontawesome/thin.min.css" | relURL }}">
+    {{- end }}
+    {{- if $theme.fontawesome.light }}
+    <link rel="stylesheet" href="{{ "fontawesome/light.min.css" | relURL }}">
+    {{- end }}
+    {{- if $theme.fontawesome.duotone }}
+    <link rel="stylesheet" href="{{ "fontawesome/duotone.min.css" | relURL }}">
+    {{- end }}
+    {{- if $theme.fontawesome.sharp_solid }}
+    <link rel="stylesheet" href="{{ "fontawesome/sharp-solid.min.css" | relURL }}">
+    {{- end }}
+</head>

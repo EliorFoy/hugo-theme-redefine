@@ -1,0 +1,19 @@
+{{- $theme := site.Params -}}
+{{- $tagsDir := site.Params.tag_dir | default "tags" -}}
+{{- $categoriesDir := site.Params.category_dir | default "categories" -}}
+{{- $archiveDir := site.Params.archive_dir | default "archives" -}}
+{{- $posts := partial "posts.html" . -}}
+<div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="{{ partial "url-for.html" $tagsDir }}">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">{{ len site.Taxonomies.tags }}</div>
+        <div class="label text-third-text-color text-sm">{{- i18n "tags" -}}</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="{{ partial "url-for.html" $categoriesDir }}">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">{{ len site.Taxonomies.categories }}</div>
+        <div class="label text-third-text-color text-sm">{{- i18n "categories" -}}</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="{{ partial "url-for.html" $archiveDir }}">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">{{ len $posts }}</div>
+        <div class="label text-third-text-color text-sm">{{- i18n "posts" -}}</div>
+    </a>
+</div>

@@ -1,0 +1,25 @@
+.dark,
+.dark-mode {
+  --highlight-background: #011627;
+  --highlight-foreground: #d6deeb;
+  --highlight-keyword: #c792ea;
+  --highlight-link: #ff869a;
+  --highlight-built-in: #addb67;
+  --highlight-number: #f78c6c;
+  --highlight-string: #ecc48d;
+  --highlight-regexp: #5ca7e4;
+  --highlight-subst: #d3423e;
+  --highlight-comment: #637777;
+  --highlight-doctag: #7fdbca;
+  --highlight-meta: #82aaff;
+  --highlight-variable: #addb67;
+  --highlight-attr: #7fdbca;
+  --highlight-section: #82b1ff;
+  --highlight-bullet: #d9f5dd;
+  --highlight-addition: #addb67;
+  --highlight-deletion: rgba(239,83,80,0.565);
+  --inline-code-foreground: #c9d1d9;
+  --inline-code-background: #313131;
+  --highlight-gutter-color: #8b949e;
+  --highlight-gutter-bg-color: #161b22;
+}

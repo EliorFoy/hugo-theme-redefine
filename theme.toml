@@ -1,0 +1,28 @@
+name = "Redefine"
+license = "GPL-3.0"
+licenselink = "https://github.com/EvanNotFound/hexo-theme-redefine/blob/main/LICENSE"
+description = "Redefine your writing with Hugo Theme Redefine — a Hugo port of the Hexo theme Redefine."
+homepage = "https://redefine.ohevan.com"
+demosite = "https://redefine.ohevan.com"
+tags = ["blog", "modern", "dark mode", "responsive", "search", "comments", "i18n"]
+features = [
+  "home banner",
+  "local search",
+  "table of contents",
+  "code highlighting",
+  "math",
+  "mermaid",
+  "comments (waline/twikoo/giscus/gitalk/utterances/artalk)",
+  "swup page transitions",
+  "multi-language",
+]
+min_version = "0.146.0"
+
+[author]
+name = "EvanNotFound"
+homepage = "https://ohevan.com"
+
+[original]
+name = "hexo-theme-redefine"
+homepage = "https://redefine.ohevan.com"
+repo = "https://github.com/EvanNotFound/hexo-theme-redefine"

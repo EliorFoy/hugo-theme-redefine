@@ -1,0 +1,50 @@
+{{- /* Home article meta info — port of pages/home/home-article.ejs. Input: dict ctx/post */ -}}
+{{- $ctx := .ctx -}}
+{{- $post := .post -}}
+{{- $theme := site.Params -}}
+{{- $isPost := partial "is-post.html" $post -}}
+<div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fa-solid fa-calendars"></i>&nbsp;
+            <span class="home-article-date" data-date="{{ $post.Date.Format "2006-01-02T15:04:05Z07:00" }}">
+                {{- if or (eq $theme.home.article_date_format "auto") (eq $theme.home.article_date_format "relative") }}
+                    {{ partial "date-fmt.html" (dict "t" $post.Date "fmt" (site.Params.date_format | default "YYYY-MM-DD")) }}
+                {{- else }}
+                    {{ partial "date-fmt.html" (dict "t" $post.Date "fmt" $theme.home.article_date_format) }}
+                {{- end }}
+            </span>
+        </span>
+        {{- if and ($post.Params.categories) $theme.home.categories.enable }}
+            <span class="home-article-category">
+                <i class="fa-solid fa-folders"></i>&nbsp;
+            <ul>
+                {{- $cats := $post.GetTerms "categories" -}}
+                {{- range $i, $cat := $cats }}
+                    {{- if gt $i 0 }}<li>|</li>{{ end }}
+                    <li>
+                        <a href="{{ $cat.RelPermalink }}">{{ $cat.LinkTitle }}</a>&nbsp;
+                    </li>
+                {{- end }}
+            </ul>
+        </span>
+        {{- end }}
+        {{- if and ($post.Params.tags) $theme.home.tags.enable }}
+            <span class="home-article-tag">
+                <i class="fa-solid fa-tags"></i>&nbsp;
+                <ul>
+                    {{- $tags := $post.GetTerms "tags" -}}
+                    {{- range $i, $tag := $tags }}
+                        {{- if or (eq $theme.home.tags.limit 0) (lt $i $theme.home.tags.limit) }}
+                        <li>
+                            {{- if gt $i 0 }}| {{ end }}
+                            <a href="{{ $tag.RelPermalink }}">{{ $tag.LinkTitle }}</a>&nbsp;
+                        </li>
+                        {{- end }}
+                    {{- end }}
+                </ul>
+            </span>
+        {{- end }}
+    </div>
+
+    <a href="{{ $post.RelPermalink }}">{{- i18n "read_more" -}}<span class="seo-reader-text">{{ $post.Title }}</span>&nbsp;<i class="fa-solid fa-angle-right"></i></a>
+</div>

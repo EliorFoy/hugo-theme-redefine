@@ -1,0 +1,5 @@
+{{/*
+  Reading-time helper (min2read), based on 300 wpm like hexo-wordcount.
+  Input: a word count (int).
+*/}}
+{{- return (math.Ceil (div (float .) 300.0)) -}}

@@ -1,0 +1,19 @@
+{{/*
+  Current-link check, port of is_current + isHomePagePagination.
+  Input: dict "page", "path"
+*/}}
+{{- $page := .page -}}
+{{- $path := string .path -}}
+{{- $current := $page.RelPermalink -}}
+{{- $result := false -}}
+{{- $p := strings.TrimSuffix "/" (strings.TrimPrefix "/" $path) -}}
+{{- $c := strings.TrimSuffix "/" (strings.TrimPrefix "/" $current) -}}
+{{- if eq $p $c -}}
+  {{- $result = true -}}
+{{- else if and (eq $p "") (strings.HasPrefix $c "page/") -}}
+  {{/* home pagination (/page/2/) keeps Home highlighted */}}
+  {{- $result = true -}}
+{{- else if ne $p "" -}}
+  {{- if strings.HasPrefix $c (printf "%s/" $p) }}{{ $result = true }}{{ end -}}
+{{- end -}}
+{{- return $result -}}

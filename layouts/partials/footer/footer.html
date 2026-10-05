@@ -1,0 +1,90 @@
+{{- $theme := site.Params -}}
+{{- $author := $theme.info.author | default site.Params.author | default site.Title }}
+<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        {{- with $theme.footer.customize }}
+            <div class="customize-info my-1">{{ . | safeHTML }}</div>
+        {{- end }}
+        <div class="text-center">
+            &copy;
+            {{- if $theme.footer.start }}
+              <span>{{ replaceRE "^\\s*(\\d{4}).*" "$1" (string $theme.footer.start) }}</span>
+              -
+            {{- end }}
+            {{ time.Format "2006" now }}&nbsp;&nbsp;{{ $theme.footer.icon | default "<i class=\"fa-regular fa-computer-classic\"></i>" | safeHTML }}&nbsp;&nbsp;<a href="{{ site.BaseURL | relURL }}">{{ $author }}</a>
+            {{- if $theme.footer.statistics }}
+                {{- $posts := partial "posts.html" . }}
+                {{- $siteWordCount := 0 }}
+                {{- range $posts }}{{ $siteWordCount = add $siteWordCount (partial "wordcount.html" .) }}{{ end }}
+                <p class="post-count space-x-0.5">
+                    <span>
+                        {{- i18n "site_posts" (len $posts) -}}
+                    </span>
+                    {{- if gt $siteWordCount 0 }}
+                    <span>
+                        {{- i18n "site_wordcount" $siteWordCount -}}
+                    </span>
+                    {{- end }}
+                </p>
+            {{- end }}
+        </div>
+        {{- if $theme.global.website_counter.enable }}
+            <script{{ if $theme.global.single_page }} data-swup-reload-script{{ end }} src="{{ $theme.global.website_counter.url | default "https://vercount.one/js" }}"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                {{- if $theme.global.website_counter.site_uv }}
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">{{- i18n "site_uv" -}}</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                {{- end }}
+                {{- if $theme.global.website_counter.site_pv }}
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">{{- i18n "site_pv" -}}</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                {{- end }}
+            </div>
+        {{- end }}
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">{{- i18n "powered_by" (printf "%s<a target=\"_blank\" class=\"text-base\" href=\"https://gohugo.io\">Hugo</a>" "<svg class=\"relative top-[2px] inline-block align-baseline\" width=\"1rem\" height=\"1rem\" viewBox=\"0 0 512 512\" xmlns=\"http://www.w3.org/2000/svg\"><path fill=\"#FFD34E\" d=\"M399.4 10.1L112.5 90.4c-8.9 2.5-15.1 11.2-14.6 20.4l18.7 334.3c.5 9.4 7.7 17.1 17.1 18.5l273.3 38.2c11.9 1.7 22.9-6.6 24.6-18.5l38.2-442.5c1.6-14.9-11.4-34.4-34.4-30.7zM259.7 354.9l-46.9-69.3-48.5 73.2h-30.9l64.3-96.2-64.3-96.2h31.9l47.5 71.1 48.2-71.1h31.4l-64.6 95.6 65.2 92.9h-33.3z\"/></svg>") | safeHTML -}}</span>
+            <span class="text-sm lg:block">{{- i18n "theme" -}}&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v{{ $theme.theme_internal.version }}</a></span>
+        </div>
+        {{- if and $theme.footer.icp.enable $theme.footer.icp.number }}
+            <div class="icp-info my-1"><a target="_blank" rel="nofollow" href="{{ $theme.footer.icp.url | default "https://beian.miit.gov.cn" }}">{{ $theme.footer.icp.number }}</a></div>
+        {{- end }}
+        {{- if $theme.footer.runtime }}
+            <div>
+                {{- i18n "runtime" -}} <span class="odometer" id="runtime_days" ></span> {{- i18n "days" -}} <span class="odometer" id="runtime_hours"></span> {{- i18n "hours" -}} <span class="odometer" id="runtime_minutes"></span> {{- i18n "minutes" -}} <span class="odometer" id="runtime_seconds"></span> {{- i18n "seconds" -}}
+            </div>
+        {{- end }}
+        {{- if $theme.footer.runtime }}
+            <script{{ if $theme.global.single_page }} data-swup-reload-script{{ end }}>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        {{- end }}
+        {{- if $theme.inject.enable }}
+            {{- range $theme.inject.footer }}
+                {{- if . }}
+                    {{- if $theme.global.single_page }}
+                        {{- replace . "<script" "<script data-swup-reload-script" | safeHTML }}
+                    {{- else }}
+                        {{- . | safeHTML }}
+                    {{- end }}
+                {{- end }}
+            {{- end }}
+        {{- end }}
+
+    </div>
+</footer>

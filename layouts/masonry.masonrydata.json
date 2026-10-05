@@ -1,0 +1,18 @@
+{{- /* Masonry gallery data — same JSON shape as the masonry-data generator. */ -}}
+{{- $entries := hugo.Data.masonry | default hugo.Data.gallery | default hugo.Data.photos
+    | default (hugo.Data.redefine.masonry | default hugo.Data.redefine.gallery | default hugo.Data.redefine.photos)
+    | default slice -}}
+{{- $items := slice -}}
+{{- range $entry := $entries -}}
+  {{- if not (reflect.IsMap $entry) }}{{ continue }}{{ end -}}
+  {{- $image := $entry.image | default $entry.url | default $entry.src -}}
+  {{- if not $image }}{{ continue }}{{ end -}}
+  {{- $width := int ($entry.width | default $entry.w | default 0) -}}
+  {{- $height := int ($entry.height | default $entry.h | default 0) -}}
+  {{- $item := dict "image" $image "title" ($entry.title | default "") "description" ($entry.description | default "") "exif" (eq ($entry.exif | default false) true) -}}
+  {{- if and (gt $width 0) (gt $height 0) -}}
+    {{- $item = merge $item (dict "width" $width "height" $height) -}}
+  {{- end -}}
+  {{- $items = $items | append $item -}}
+{{- end -}}
+{{- $items | jsonify (dict "indent" "") -}}

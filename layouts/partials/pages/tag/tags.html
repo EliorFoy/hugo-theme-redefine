@@ -1,0 +1,41 @@
+{{- /* Tags list page — port of pages/tag/tags.ejs. Input: dict ctx/paginator */ -}}
+{{- $ctx := .ctx -}}
+{{- $theme := site.Params -}}
+{{- if gt (len site.Taxonomies.tags) 0 }}
+	<h1 class="page-title-header">
+		{{- $ctx.Title | default (i18n "tags") -}}
+	</h1>
+
+	{{- if eq $theme.page_templates.tags_style "cloud" }}
+	<div class="tagcloud-content">
+		{{- $max := 1 -}}
+		{{- $min := 1000000 -}}
+		{{- range $name, $term := site.Taxonomies.tags }}
+			{{- $c := len $term -}}
+			{{- if gt $c $max }}{{ $max = $c }}{{ end -}}
+			{{- if lt $c $min }}{{ $min = $c }}{{ end -}}
+		{{- end -}}
+		{{- range $name, $term := site.Taxonomies.tags }}
+			{{- $weight := len $term -}}
+			{{- $size := 1.0 -}}
+			{{- if gt $max $min }}
+				{{- $size = add 1.0 (mul 4.0 (div (sub (float $weight) (float $min)) (sub (float $max) (float $min)))) -}}
+			{{- end }}
+			<a href="{{ partial "url-for.html" (site.Params.tag_dir | default "tags") }}/{{ $name | urlize }}/" style="font-size: {{ $size }}rem;">{{ $term.Page.LinkTitle }}</a>
+		{{- end }}
+	</div>
+
+	{{- else }}
+	<div class="tagcloud-content">
+		<ul class="tag-list" data-show-value="true">
+			{{- range $name, $term := site.Taxonomies.tags }}
+				<li>
+					<a data-weight="{{ len $term }}" href="{{ partial "url-for.html" (site.Params.tag_dir | default "tags") }}/{{ $name | urlize }}/">
+						<i class="fa-solid fa-hashtag"></i>{{ $term.Page.LinkTitle }}
+					</a>
+				</li>
+			{{- end }}
+		</ul>
+	</div>
+	{{- end }}
+{{- end }}

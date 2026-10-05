@@ -1,0 +1,13 @@
+{{- /* Local search index — same XML format as hexo-generator-searchdb (search.xml) */ -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\"?>" | safeHTML }}
+<search>
+	{{- $posts := partial "posts.html" . }}
+	{{- range $post := $posts }}
+	{{- $content := $post.Plain | htmlEscape }}
+	<entry>
+		<title>{{ $post.Title | htmlEscape }}</title>
+		<url>{{ $post.RelPermalink }}</url>
+		<content type="html"><![CDATA[{{ $post.Content | safeHTML }}]]></content>
+	</entry>
+	{{- end }}
+</search>

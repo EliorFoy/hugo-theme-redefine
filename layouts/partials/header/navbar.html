@@ -1,0 +1,154 @@
+<header class="navbar-container px-6 md:px-12">
+    {{- $theme := site.Params -}}
+    {{- $ctx := . -}}
+    {{- $isHomeWithBanner := and $theme.home_banner.enable $ctx.IsHome -}}
+    {{- $navItems := partial "navbar-links.html" . -}}
+    {{- $navNames := slice -}}
+    {{- range $item := $navItems }}{{ $navNames = $navNames | append $item.name }}{{ end -}}
+    <div class="navbar-content transition-navbar {{ if $isHomeWithBanner }}has-home-banner{{ end }}">
+        <div class="left">
+            {{- with $theme.defaults.logo }}
+                <a class="logo-image h-8 w-8 sm:w-10 sm:h-10 mr-3" href="{{ site.BaseURL | relURL }}">
+                    <img src="{{ partial "url-for.html" . }}" class="w-full h-full rounded-xs">
+                </a>
+            {{- end }}
+            <a class="logo-title" href="{{ site.BaseURL | relURL }}">
+                {{- if $isHomeWithBanner }}<h1>{{ end }}{{ $theme.info.title | default site.Title }}{{- if $isHomeWithBanner }}</h1>{{ end -}}
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    {{- range $item := $navItems }}
+                        {{- $name := $item.name -}}
+                        {{- if ne $item.path "none" }}
+                            {{- $hasSubmenus := isset $item "submenus" -}}
+                            {{- $isActive := partial "is-current.html" (dict "page" $ctx "path" $item.path) -}}
+                            {{- $linkHref := "#" -}}
+                            {{- if not $hasSubmenus }}{{ $linkHref = partial "url-for.html" $item.path }}{{ end -}}
+                            {{- $linkText := i18n (lower $name) | default $name -}}
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="{{ if $hasSubmenus }}has-dropdown{{ else if $isActive }}active{{ end }}"
+                                   href="{{ $linkHref }}"
+                                        {{- if $hasSubmenus }} onClick="return false;"{{ end }}>
+                                    {{- with $item.icon }}<i class="{{ . }} fa-fw"></i>{{ end -}}
+                                    {{ upper $linkText }}
+                                    {{- if $hasSubmenus }}<i class="fa-solid fa-chevron-down fa-fw"></i>{{ end -}}
+                                </a>
+
+                                <!-- Submenu -->
+                                {{- if $hasSubmenus }}
+                                    <ul class="sub-menu">
+                                        {{- range $subName, $subPath := $item.submenus }}
+                                            <li>
+                                                <a href="{{ partial "url-for.html" $subPath }}">
+                                                    {{ upper (i18n (lower $subName) | default $subName) }}
+                                                </a>
+                                            </li>
+                                        {{- end }}
+                                    </ul>
+                                {{- end }}
+                            </li>
+                        {{- end }}
+                    {{- end }}
+                    {{- if $theme.navbar.search.enable }}
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    {{- end }}
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                {{- if $theme.navbar.search.enable }}
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                {{- end }}
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            {{- range $item := $navItems }}
+                {{- $name := $item.name -}}
+                {{- if ne $item.path "none" }}
+                    {{- $hasSubmenus := isset $item "submenus" -}}
+                    {{- $isActive := partial "is-current.html" (dict "page" $ctx "path" $item.path) -}}
+                    {{- $linkText := i18n (lower $name) | default $name -}}
+                    {{- $linkPath := "#" -}}
+                    {{- if not $hasSubmenus }}{{ $linkPath = partial "url-for.html" $item.path }}{{ end -}}
+                    {{- $drawerNavbarItemClass := "drawer-navbar-item" -}}
+                    {{- if $hasSubmenus }}{{ $drawerNavbarItemClass = "drawer-navbar-item-sub" }}{{ end -}}
+
+                    <li class="{{ $drawerNavbarItemClass }} text-base my-1.5 flex flex-col w-full">
+                        {{- if $hasSubmenus }}
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full {{ if $isActive }}active{{ end }}"
+                             navbar-data-toggle="submenu-{{ $name }}"
+                        >
+                            <span>
+                                {{ $linkText }}
+                            </span>
+                            {{- with $item.icon }}
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            {{- end }}
+                        </div>
+                        {{- else }}
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full {{ if $isActive }}active{{ end }}"
+                           href="{{ $linkPath }}"
+                        >
+                            <span>
+                                {{ $linkText }}
+                            </span>
+                            {{- with $item.icon }}
+                                <i class="{{ . }} fa-sm fa-fw"></i>
+                            {{- end }}
+                        </a>
+                        {{- end }}
+
+                        {{- if $hasSubmenus }}
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-{{ $name }}">
+                                {{- range $subName, $subPath := $item.submenus }}
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="{{ partial "url-for.html" $subPath }}">{{ upper (i18n (lower $subName) | default $subName) }}</a>
+                                    </div>
+                                {{- end }}
+                            </div>
+                        {{- end }}
+                    </li>
+                {{- end }}
+            {{- end }}
+
+            {{/* Add sidebar links */}}
+            {{- if and $theme.home.sidebar.links (ne $theme.home.sidebar.show_on_mobile false) }}
+                {{- range $name, $link := $theme.home.sidebar.links }}
+                    {{- if and (not (in $navNames $name)) (ne $link.path "none") }}
+                        <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                            <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                               href="{{ partial "url-for.html" $link.path }}"
+                            >
+                                <span>{{ i18n (lower $name) | default $name }}</span>
+                                {{- with $link.icon }}
+                                    <i class="{{ . }} fa-sm fa-fw"></i>
+                                {{- end }}
+                            </a>
+                        </li>
+                    {{- end }}
+                {{- end }}
+            {{- end }}
+        </ul>
+
+        {{- partial "sidebar/statistics.html" . }}
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>

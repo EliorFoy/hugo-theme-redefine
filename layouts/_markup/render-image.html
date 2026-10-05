@@ -1,0 +1,10 @@
+{{- /*
+  Image render hook — ports the lazyload + image-caption Hexo filters.
+*/ -}}
+{{- $theme := site.Params -}}
+{{- $img := partial "post-img.html" (dict "src" .Destination "alt" .PlainText "title" .Title "lazy" $theme.articles.lazyload) -}}
+{{- if and $theme.articles.style.image_caption .PlainText .IsBlock -}}
+<figure class="image-caption">{{ $img }}<figcaption>{{ .PlainText }}</figcaption></figure>
+{{- else -}}
+{{- $img -}}
+{{- end -}}

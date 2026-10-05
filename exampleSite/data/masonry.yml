@@ -1,0 +1,10 @@
+- image: /images/wallhaven-wqery6-light.webp
+  title: 示意图 1
+  description: 亮色壁纸
+  width: 1920
+  height: 1080
+- image: /images/wallhaven-wqery6-dark.webp
+  title: 示意图 2
+  description: 暗色壁纸
+  width: 1920
+  height: 1080

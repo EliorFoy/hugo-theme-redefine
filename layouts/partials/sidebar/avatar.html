@@ -1,0 +1,6 @@
+{{- $theme := site.Params -}}
+{{- $author := $theme.info.author | default site.Params.author | default site.Title -}}
+{{- $posts := partial "posts.html" . -}}
+<div class="avatar flex justify-center">
+    <img src="{{ partial "url-for.html" $theme.defaults.avatar }}" alt="avatar">
+</div>

@@ -1,0 +1,20 @@
+{{/*
+  Decides whether the page is a "post" (article layout).
+  A page is a post when it lives in the posts section (params.posts_section, default "posts")
+  and has no special page layout; front matter `type: post` forces it,
+  `layout: <anything>` makes it a themed page instead.
+*/}}
+{{- $postsSection := site.Params.posts_section | default "posts" -}}
+{{- $result := false -}}
+{{- if eq .Kind "page" -}}
+  {{- if .Params.layout -}}
+    {{- $result = false -}}
+  {{- else if eq (string .Params.type | default "") "post" -}}
+    {{- $result = true -}}
+  {{- else if eq (string .Params.type | default "") "page" -}}
+    {{- $result = false -}}
+  {{- else if eq .Section $postsSection -}}
+    {{- $result = true -}}
+  {{- end -}}
+{{- end -}}
+{{- return $result -}}

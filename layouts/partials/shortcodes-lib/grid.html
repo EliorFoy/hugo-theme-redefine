@@ -1,0 +1,37 @@
+{{- /*
+  {% grid %} — port of scripts/modules/grid.js.
+  {{< grid cols=3 gap=16 >}} cells (buttons) {{< /grid >}}
+*/ -}}
+{{- $cols := 2 -}}
+{{- $gap := "16px" -}}
+{{- $classNames := slice -}}
+{{- if .sc.IsNamedParams -}}
+  {{- $cols = int (.sc.Get "cols" | default (.sc.Get "columns") | default 2) -}}
+  {{- $gapRaw := string (.sc.Get "gap" | default "") -}}
+  {{- if $gapRaw }}
+    {{- if findRE "^-?[0-9]+(\\.[0-9]+)?$" $gapRaw }}{{ $gap = printf "%spx" $gapRaw }}
+    {{- else if findRE "^-?[0-9]+(\\.[0-9]+)?(px|rem|em|%|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc)$" $gapRaw }}{{ $gap = $gapRaw }}{{ end -}}
+  {{- end -}}
+  {{- $cls := string (.sc.Get "class" | default (.sc.Get "classes") | default "") -}}
+  {{- range $c := (split $cls " ") }}{{ if $c }}{{ $classNames = $classNames | append $c }}{{ end }}{{ end -}}
+{{- else -}}
+  {{- $args := slice -}}
+  {{- range $a := .sc.Params }}{{ $args = $args | append (string $a) }}{{ end -}}
+  {{- if gt (len $args) 0 -}}
+    {{- if findRE "^[0-9]+$" (index $args 0) }}{{ $cols = int (index $args 0) }}{{ $args = after 1 $args }}{{ end -}}
+  {{- end -}}
+  {{- if gt (len $args) 0 -}}
+    {{- if findRE "^-?[0-9]+(\\.[0-9]+)?(px|rem|em|%|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc)?$" (index $args 0) }}{{ $gapRaw := index $args 0 }}
+      {{- if findRE "^-?[0-9]+(\\.[0-9]+)?$" $gapRaw }}{{ $gap = printf "%spx" $gapRaw }}{{ else }}{{ $gap = $gapRaw }}{{ end }}
+      {{- $args = after 1 $args }}
+    {{- end -}}
+  {{- end -}}
+  {{- $classNames = $args -}}
+{{- end -}}
+{{- if lt $cols 2 }}{{ $cols = 2 }}{{ end -}}
+{{- $rendered := .inner -}}
+{{- $rendered = replaceRE ">[ \\t]*\\n[ \\t]*<" "><" $rendered -}}
+{{- $rendered = strings.TrimSpace $rendered -}}
+<div class="grid my-4{{ range $c := $classNames }} {{ $c }}{{ end }}" style="grid-template-columns: repeat({{ $cols }}, minmax(0, 1fr)); gap: {{ $gap }};">
+  {{ $rendered | safeHTML }}
+</div>

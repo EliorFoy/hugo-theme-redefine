@@ -1,0 +1,55 @@
+{{- $theme := site.Params -}}
+{{- $u := $theme.comment.config.utterances -}}
+{{- if and (eq $theme.comment.system "utterances") $u $u.repo }}
+    {{- $issueNumber := $u.issue_number -}}
+    {{- $issueTerm := $u.issue_term | default "pathname" -}}
+    {{- $themeLight := $u.theme_light | default "github-light" -}}
+    {{- $themeDark := $u.theme_dark | default "github-dark" -}}
+    <div id="utterances-container"
+         data-utterances-theme-light="{{ $themeLight }}"
+         data-utterances-theme-dark="{{ $themeDark }}">
+    </div>
+    <script {{ if $theme.global.single_page }}data-swup-reload-script{{ end }}>
+        (function() {
+            const container = document.getElementById("utterances-container");
+            if (!container) {
+                return;
+            }
+
+            const repo = "{{ $u.repo }}";
+            const issueNumber = "{{ $issueNumber | default "" }}";
+            const issueTerm = "{{ $issueTerm }}";
+            const label = "{{ $u.label | default "" }}";
+
+            if (!repo || (!issueNumber && !issueTerm)) {
+                return;
+            }
+
+            container.innerHTML = "";
+
+            const themeLight = container.dataset.utterancesThemeLight || "github-light";
+            const themeDark = container.dataset.utterancesThemeDark || "github-dark";
+            const isDark = document.body.classList.contains("dark-mode");
+            const theme = isDark ? themeDark : themeLight;
+
+            const script = document.createElement("script");
+            script.src = "https://utteranc.es/client.js";
+            script.async = true;
+            script.crossOrigin = "anonymous";
+            script.setAttribute("repo", repo);
+
+            if (issueNumber) {
+                script.setAttribute("issue-number", issueNumber);
+            } else {
+                script.setAttribute("issue-term", issueTerm);
+            }
+
+            if (label) {
+                script.setAttribute("label", label);
+            }
+
+            script.setAttribute("theme", theme);
+            container.appendChild(script);
+        })();
+    </script>
+{{- end }}

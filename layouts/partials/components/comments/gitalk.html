@@ -1,0 +1,55 @@
+{{- $theme := site.Params -}}
+{{- $gt := $theme.comment.config.gitalk -}}
+{{- $lang := site.Language.Lang | default "en" -}}
+{{- if and (eq $theme.comment.system "gitalk") $gt.clientID $gt.clientSecret $gt.owner $gt.repo }}
+    <div id="gitalk-container"></div>
+    <script {{ if $theme.global.single_page }}data-swup-reload-script {{ end }}
+            src="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.min.js"></script>
+    <script {{ if $theme.global.single_page }}data-swup-reload-script{{ end }}>
+        (function() {
+            const startPath = location.pathname;
+            const startTime = Date.now();
+            const retryDelay = 200;
+            const retryLimit = 5000;
+
+            const runGitalk = () => {
+                if (location.pathname !== startPath) {
+                    return;
+                }
+
+                const container = document.getElementById('gitalk-container');
+                if (!container || typeof Gitalk === 'undefined') {
+                    if (Date.now() - startTime < retryLimit) {
+                        setTimeout(runGitalk, retryDelay);
+                    }
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                let pageKey = decodeURI(location.pathname);
+                const maxLength = 50;
+                if (pageKey.length > maxLength) {
+                    pageKey = pageKey.substring(0, maxLength - 3) + '...';
+                }
+
+                try {
+                    new Gitalk({
+                        clientID: '{{ $gt.clientID }}',
+                        clientSecret: '{{ $gt.clientSecret }}',
+                        repo: '{{ $gt.repo }}',
+                        owner: '{{ $gt.owner }}',
+                        admin: ['{{ $gt.owner }}'],
+                        id: pageKey,
+                        language: '{{ $lang }}',
+                        proxy: '{{ $gt.proxy | default "https://github.com/login/oauth/access_token" }}'
+                    }).render(container);
+                } catch (e) {
+                    window.Gitalk = null;
+                }
+            };
+
+            runGitalk();
+        })();
+    </script>
+{{- end }}

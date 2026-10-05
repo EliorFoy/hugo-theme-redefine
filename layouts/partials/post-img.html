@@ -1,0 +1,14 @@
+{{/*
+  Builds the <img> markup for article images (lazyload-aware).
+  Input: dict { src, alt, title, lazy }. Returns an HTML string.
+*/ -}}
+{{- $src := .src | safeURL -}}
+{{- $alt := .alt -}}
+{{- $titleAttr := "" -}}
+{{- with .title }}{{ $titleAttr = printf " title=\"%s\"" . }}{{ end -}}
+{{- $loading := "images/loading.svg" | relURL -}}
+{{- if .lazy -}}
+{{- return (printf `<img lazyload src="%s" data-src="%s" alt="%s"%s>` $loading $src $alt $titleAttr) -}}
+{{- else -}}
+{{- return (printf `<img src="%s" alt="%s"%s loading="lazy">` $src $alt $titleAttr) -}}
+{{- end -}}

@@ -1,0 +1,33 @@
+{{/*
+  Resolves the theme page type for a page — port of getPageData/pageData in page-helpers.js.
+  Input: a page. Returns dict {type, partial, layout} or nil.
+*/}}
+{{- $page := . -}}
+{{- $layout := string ($page.Params.layout | default "") -}}
+{{- $ptype := string ($page.Params.type | default $page.Params.template | default "") -}}
+{{- $title := lower ($page.Title | default "") -}}
+
+{{- $all := slice
+  (dict "type" "home"       "titles" (slice "home" "首页")                          "types" (slice "home")                                "partial" "pages/home/home-content"        "layout" "raw")
+  (dict "type" "archive"    "titles" (slice "archive" "归档")                       "types" (slice "archive" "archives")                  "partial" "pages/archive/archive"          "layout" "raw")
+  (dict "type" "post"       "titles" (slice "post" "文章")                          "types" (slice "post" "posts")                        "partial" "pages/post/article-content"     "layout" "raw")
+  (dict "type" "categories" "titles" (slice "category" "categories")                "types" (slice "category" "categories")               "partial" "pages/category/categories"      "layout" "default")
+  (dict "type" "tags"       "titles" (slice "tag" "tags")                           "types" (slice "tag" "tags")                          "partial" "pages/tag/tags"                 "layout" "default")
+  (dict "type" "notFound"   "titles" (slice "404" "notfound")                       "types" (slice "404" "notfound")                      "partial" "pages/notfound/notfound"        "layout" "raw")
+  (dict "type" "friends"    "titles" (slice "friends" "links" "link" "friend" "友情链接") "types" (slice "links" "link")                "partial" "pages/friends/friends-link"     "layout" "default")
+  (dict "type" "shuoshuo"   "titles" (slice "shuoshuo" "说说")                      "types" (slice "essays" "essay" "shuoshuo")           "partial" "pages/shuoshuo/essays"          "layout" "default")
+  (dict "type" "masonry"    "titles" (slice "gallery" "瀑布流" "相册" "photos" "photo" "masonry") "types" (slice "masonry" "gallery" "瀑布流" "相册" "photos" "photo") "partial" "pages/masonry/masonry" "layout" "raw")
+  (dict "type" "bookmarks"  "titles" (slice)                                        "types" (slice "bookmarks" "bookmark" "tools")        "partial" "pages/bookmarks/bookmarks"      "layout" "raw")
+-}}
+
+{{- $result := dict -}}
+{{- range $entry := $all -}}
+  {{- if $result }}{{ else }}
+    {{- $matched := false -}}
+    {{- range $t := $entry.types }}{{ if or (eq $t $ptype) (eq $t $layout) }}{{ $matched = true }}{{ end }}{{ end -}}
+    {{- if not $matched }}{{ range $ti := $entry.titles }}{{ if eq $ti $title }}{{ $matched = true }}{{ end }}{{ end }}{{ end -}}
+    {{- if $matched }}{{ $result = $entry }}{{ end -}}
+  {{- end }}
+{{- end -}}
+
+{{- return $result -}}

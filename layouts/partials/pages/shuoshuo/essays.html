@@ -1,0 +1,26 @@
+{{- /* Essays (shuoshuo) page — port of pages/shuoshuo/essays.ejs. Reads data/essays.yml */ -}}
+{{- $ctx := .ctx -}}
+{{- $theme := site.Params -}}
+{{- $avatar := $theme.defaults.avatar -}}
+{{- $essays := hugo.Data.redefine.essays | default hugo.Data.essays | default slice -}}
+{{- $essays = sort $essays "date" "desc" -}}
+<div class="mb-4">
+	<h1 class="page-title-header">{{ $ctx.Title }}</h1>
+	<ul class="flex flex-col mb-4 gap-6">
+		{{- range $e := $essays }}
+		<li class="w-full flex flex-row relative">
+			<div class="w-10 h-10 mr-4 rounded-lg overflow-hidden border border-border-color p-[1px] shrink-0">
+				<img class="w-full h-full rounded-[6.2px]" src="{{ partial "url-for.html" $avatar }}" alt="avatar">
+			</div>
+			<div class="w-full border-border-color rounded-xl rounded-tl-none shadow-redefine-flat overflow-hidden">
+				{{- /* raw UTC date in a data attribute; client JS renders localized calendar date */ -}}
+				{{- $d := time (printf "%s" (string $e.date)) -}}
+				{{- $utc := $d.UTC.Format "2006-01-02T15:04:05Z07:00" -}}
+				<div class="essay-date px-4 py-1.5 text-sm border-b border-border-color bg-zinc-50 dark:bg-zinc-800 text-third-text-color" data-date="{{ $utc }}">Loading Date...</div>
+				<div id="shuoshuo-content" class="px-4 py-2">{{ $ctx.RenderString (string $e.content) }}</div>
+			</div>
+			<div class="absolute left-[50.5px] top-3 transform w-2 h-2 border-solid border-t border-l bg-zinc-50 -rotate-45 border-border-color dark:bg-zinc-800"></div>
+		</li>
+		{{- end }}
+	</ul>
+</div>

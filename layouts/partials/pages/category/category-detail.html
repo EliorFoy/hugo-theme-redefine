@@ -1,0 +1,9 @@
+{{- /* Single category page — port of pages/category/category-detail.ejs (kind=term). Input: dict ctx/paginator */ -}}
+{{- $ctx := .ctx -}}
+{{- $posts := $ctx.Pages -}}
+<div class="category-name">
+    <i class="fa-solid fa-folder"></i>&nbsp;{{ $ctx.Title }}
+</div>
+<div class="category-post-list">
+    {{- partial "utils/posts-list.html" (dict "ctx" $ctx "posts" ($posts.ByDate.Reverse)) }}
+</div>

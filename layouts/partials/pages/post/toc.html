@@ -1,0 +1,31 @@
+{{- /* Table of contents — port of pages/post/toc.ejs + hexo toc helper. Input: the post page */ -}}
+{{- $theme := site.Params -}}
+{{- $maxDepth := int ($theme.articles.toc.max_depth | default 3) -}}
+{{- $toc := "" -}}
+{{- with .Fragments -}}
+  {{- $toc = .ToHTML 1 $maxDepth true -}}
+  {{- $toc = replaceRE `<nav id="TableOfContents">\s*<ol>\s*<li>\s*<ol>` `<ol class="nav">` $toc -}}
+  {{- $toc = replaceRE `</ol>\s*</li>\s*</ol>\s*</nav>` `</ol>` $toc -}}
+  {{- $toc = replaceRE `<li>` `<li class="nav-item">` $toc -}}
+  {{- $toc = replaceRE `<a href="#` `<a class="nav-link" href="#` $toc -}}
+  {{- $toc = replaceRE `(<a class="nav-link" href="#[^"]*">)([^<]+)(</a>)` `$1<span class="nav-text">$2</span>$3` $toc -}}
+  {{- $toc = replaceRE `<ol>\s*<li class="nav-item">` `<ol class="nav-child"><li class="nav-item">` $toc -}}
+{{- end -}}
+<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">{{- i18n "toc" -}}</div>
+		<div class="page-title">{{ .Title }}</div>
+		{{- $toc | safeHTML -}}
+
+	</div>
+</div>
+{{- if $theme.articles.toc.number }}
+<style>
+	.post-toc ol.nav { counter-reset: toc-nav; }
+	.post-toc ol.nav > li.nav-item { counter-increment: toc-nav; }
+	.post-toc ol.nav > li.nav-item > a.nav-link::before { content: counter(toc-nav) ". "; }
+	.post-toc ol.nav-child { counter-reset: toc-nav-child; }
+	.post-toc ol.nav-child > li.nav-item { counter-increment: toc-nav-child; }
+	.post-toc ol.nav-child > li.nav-item > a.nav-link::before { content: counter(toc-nav, decimal-leading-zero) ". "; }
+</style>
+{{- end }}

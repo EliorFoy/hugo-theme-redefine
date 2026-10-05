@@ -1,0 +1,99 @@
+{{- /*
+  {% tabs %} — port of scripts/modules/tabs.js.
+  {{< tabs name="demo" active=1 >}}
+  <!-- tab Title@fa-icon -->
+  content...
+  <!-- tab Another -->
+  content...
+  <!-- endtab (optional, blocks end at the next marker otherwise) -->
+  {{< /tabs >}}
+*/ -}}
+{{- $inner := .inner -}}
+
+{{- $tabName := "" -}}
+{{- $activeIndex := 0 -}}
+{{- if .sc.IsNamedParams -}}
+  {{- $tabName = string (.sc.Get "name" | default (.sc.Get "id") | default "") -}}
+  {{- $activeIndex = int (.sc.Get "active" | default 0) -}}
+{{- else -}}
+  {{- $args := slice -}}
+  {{- range $a := .sc.Params }}{{ $args = $args | append (string $a) }}{{ end -}}
+  {{- if gt (len $args) 0 -}}
+    {{- $first := index $args 0 -}}
+    {{- if and (gt (len $args) 1) (findRE "^[0-9]+$" (index $args 1)) }}{{ $activeIndex = int (index $args 1) }}{{ end -}}
+    {{- if findRE "^[0-9]+$" $first }}{{ $activeIndex = int $first }}
+    {{- else if not (in $first "::") }}{{ $tabName = $first }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* resolve tab name (slug from page path when empty) */ -}}
+{{- if not $tabName }}{{ $tabName = .sc.Page.RelPermalink }}{{ end -}}
+{{- $tabName = lower $tabName -}}
+{{- $tabName = replaceRE "[^a-z0-9_-]+" "-" $tabName -}}
+{{- $tabName = replaceRE "-{2,}" "-" $tabName -}}
+{{- $tabName = replaceRE "^[-_]+|[-_]+$" "" $tabName -}}
+{{- if not $tabName }}{{ $tabName = "tabs" }}{{ end -}}
+{{- if not (findRE "^[a-z]" $tabName) }}{{ $tabName = printf "tab-%s" $tabName }}{{ end -}}
+
+{{- /* parse tab blocks: split on "<!-- tab " markers */ -}}
+{{- $blocks := slice -}}
+{{- if $inner -}}
+  {{- $chunks := split $inner "<!-- tab " -}}
+  {{- range $ci, $chunk := $chunks -}}
+    {{- if eq $ci 0 }}{{ continue }}{{ end -}}
+    {{- $header := "" -}}
+    {{- $body := "" -}}
+    {{- $sepParts := split $chunk "-->" -}}
+    {{- if gt (len $sepParts) 1 -}}
+      {{- $header = strings.TrimSpace (index $sepParts 0) -}}
+      {{- $rest := delimit (after 1 $sepParts) "-->" -}}
+      {{- $endParts := split $rest "<!-- endtab -->" -}}
+      {{- if gt (len $endParts) 1 }}{{ $rest = index $endParts 0 }}{{ end -}}
+      {{- $body = strings.TrimSpace $rest -}}
+    {{- end -}}
+    {{- if ne $header "" }}{{ $blocks = $blocks | append (dict "header" $header "body" $body) }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* resolve active index */ -}}
+{{- if or (lt $activeIndex 1) (gt $activeIndex (len $blocks)) }}{{ $activeIndex = 1 }}{{ end -}}
+
+{{- /* build nav + content */ -}}
+{{- $tabNav := "" -}}
+{{- $tabContent := "" -}}
+{{- range $bi, $block := $blocks -}}
+  {{- $index := add $bi 1 -}}
+  {{- $headerRaw := $block.header -}}
+  {{- $caption := "" -}}
+  {{- $icon := "" -}}
+  {{- if strings.Contains $headerRaw "title=\"" -}}
+    {{- /* named header form: title="..." icon="..." */ -}}
+    {{- $caption = replaceRE "^[\\s\\S]*title=\"([^\"]*)\"[\\s\\S]*$" "$1" $headerRaw -}}
+    {{- if strings.Contains $headerRaw "icon=\"" }}
+      {{- $icon = replaceRE "^[\\s\\S]*[ \t]icon=\"([^\"]*)\"[\\s\\S]*$" "$1" $headerRaw -}}
+    {{- end -}}
+  {{- else -}}
+    {{- /* positional form: caption@icon */ -}}
+    {{- $atParts := split $headerRaw "@" -}}
+    {{- if gt (len $atParts) 1 -}}
+      {{- $caption = strings.TrimSpace (index $atParts 0) -}}
+      {{- $icon = strings.TrimSpace (delimit (after 1 $atParts) "@") -}}
+    {{- else -}}
+      {{- $caption = strings.TrimSpace $headerRaw -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $tabHref := printf "%s-%d" $tabName $index -}}
+  {{- $finalContent := $.sc.Page.RenderString $block.body -}}
+  {{- $active := eq $index $activeIndex -}}
+  {{- $buttonState := "inactive" -}}
+  {{- if $active }}{{ $buttonState = "active" }}{{ end -}}
+  {{- $hiddenAttr := "" -}}
+  {{- if not $active }}{{ $hiddenAttr = " hidden" }}{{ end -}}
+  {{- $tabNav = printf "%s<button type=\"button\" role=\"tab\" aria-selected=\"%v\" data-state=\"%s\" data-tab=\"%s\" class=\"inline-flex items-center gap-2 whitespace-nowrap text-third-text-color border-b-2 border-transparent py-2 text-sm font-medium transition-colors hover:text-second-text-color data-[state=active]:border-primary data-[state=active]:text-primary\" tabindex=\"%s\">%s%s</button>" $tabNav $active $buttonState $tabHref (cond $active "0" "-1") $icon $caption -}}
+  {{- $tabContent = printf "%s<div class=\"tab-pane\" data-state=\"%s\" id=\"%s\"%s>%s</div>" $tabContent $buttonState $tabHref $hiddenAttr $finalContent -}}
+{{- end -}}
+
+<div class="tabs relative my-4 bg-second-background-color border border-border-color rounded-md" id="tab-{{ $tabName }}">
+  <div role="tablist" aria-orientation="horizontal" class="flex gap-3.5 overflow-x-auto px-4 not-markdown scrollbar-hide" tabindex="0">{{ $tabNav | safeHTML }}</div>
+  <div class="tab-content p-4 bg-background-color/70 rounded-md shadow-[0_0_2px_0_var(--shadow-color-1)]">{{ $tabContent | safeHTML }}</div>
+</div>

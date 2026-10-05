@@ -1,0 +1,19 @@
+{{/*
+  Normalizes navbar links into a slice of {name, path, icon, submenus}.
+  Accepts both map form (sorted alphabetically) and array form (user order):
+    [params.navbar.links]                |  [[params.navbar.links.list]]
+    Archives = { path = "/archives/" }   |  name = "Archives"
+                                         |  path = "/archives/"
+*/}}
+{{- $links := site.Params.navbar.links -}}
+{{- $items := slice -}}
+{{- if reflect.IsSlice $links -}}
+  {{- range $link := $links -}}
+    {{- if $link }}{{ $items = $items | append (merge (dict "name" (string $link.name)) $link) }}{{ end -}}
+  {{- end -}}
+{{- else -}}
+  {{- range $name, $link := $links -}}
+    {{- if $link }}{{ $items = $items | append (merge (dict "name" (string $name)) $link) }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $items -}}

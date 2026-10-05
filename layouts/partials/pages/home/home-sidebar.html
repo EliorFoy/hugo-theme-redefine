@@ -1,0 +1,78 @@
+{{- /* Home sidebar — port of pages/home/home-sidebar.ejs */ -}}
+{{- $theme := site.Params -}}
+<div class="home-sidebar-container">
+    <div class="sticky-container sticky">
+        {{- $hasSidebarLinks := isset $theme.home.sidebar "links" -}}
+        {{- $hasSidebarAnnouncement := and (isset $theme.home.sidebar "announcement") $theme.home.sidebar.announcement -}}
+        {{- if eq $theme.home.sidebar.first_item "info" }}
+            <div class="sidebar-content">
+                {{- partial "sidebar/avatar.html" . }}
+                {{- partial "sidebar/author.html" . }}
+                {{- partial "sidebar/statistics.html" . }}
+            </div>
+            {{- if or $hasSidebarLinks $hasSidebarAnnouncement }}
+                <div class="sidebar-links" marginTop>
+                    <div class="site-info">
+                        <div class="site-name">{{ $theme.info.title | default site.Title }}</div>
+                        {{- if and $hasSidebarAnnouncement $hasSidebarLinks }}
+                            <div class="announcement">
+                                {{- $theme.home.sidebar.announcement -}}
+                            </div>
+                        {{- end }}
+                    </div>
+                    {{- if $hasSidebarLinks }}
+                        {{- range $name, $link := $theme.home.sidebar.links }}
+                            {{- if ne $link.path "none" }}
+                                <a class="links" href="{{ partial "url-for.html" $link.path }}">
+                                    {{- with $link.icon }}
+                                        <i class="{{ . }} icon-space"></i>
+                                    {{- end }}
+                                    <span class="link-name">{{ i18n (lower $name) | default $name }}</span>
+                                </a>
+                            {{- end }}
+                        {{- end }}
+                    {{- else }}
+                        <div class="announcement-outside">
+                            {{- $theme.home.sidebar.announcement -}}
+                        </div>
+                    {{- end }}
+                </div>
+            {{- end }}
+        {{- else }}
+            {{- if or $hasSidebarLinks $hasSidebarAnnouncement }}
+                <div class="sidebar-links" marginTop>
+                    <div class="site-info">
+                        <div class="site-name">{{ $theme.info.title | default site.Title }}</div>
+                        {{- if and $hasSidebarAnnouncement $hasSidebarLinks }}
+                            <div class="announcement">
+                                {{- $theme.home.sidebar.announcement -}}
+                            </div>
+                        {{- end }}
+                    </div>
+                    {{- if $hasSidebarLinks }}
+                        {{- range $name, $link := $theme.home.sidebar.links }}
+                            {{- if ne $link.path "none" }}
+                                <a class="links" href="{{ partial "url-for.html" $link.path }}">
+                                    {{- with $link.icon }}
+                                        <i class="{{ . }} icon-space"></i>
+                                    {{- end }}
+                                    <span class="link-name">{{ i18n (lower $name) | default $name }}</span>
+                                </a>
+                            {{- end }}
+                        {{- end }}
+                    {{- else }}
+                        <div class="announcement-outside">
+                            {{- $theme.home.sidebar.announcement -}}
+                        </div>
+                    {{- end }}
+                </div>
+            {{- end }}
+            <div class="sidebar-content"{{ if or $hasSidebarLinks $hasSidebarAnnouncement }} marginTop{{ end }}>
+                {{- partial "sidebar/avatar.html" . }}
+                {{- partial "sidebar/author.html" . }}
+                {{- partial "sidebar/statistics.html" . }}
+            </div>
+        {{- end }}
+
+    </div>
+</div>

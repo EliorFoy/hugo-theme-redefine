@@ -1,0 +1,4 @@
+{{ define "main" }}
+{{- $partialName := partial "resolve-content-partial.html" . }}
+{{- partial "page-container.html" (dict "ctx" . "partial" $partialName) }}
+{{ end }}

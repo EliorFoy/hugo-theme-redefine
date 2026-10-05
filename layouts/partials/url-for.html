@@ -1,0 +1,10 @@
+{{/*
+  Root-relative URL, mirrors the Hexo `url_for` helper.
+  Full URLs (http/https) pass through unchanged.
+*/}}
+{{- $p := trim (string .) " " -}}
+{{- if or (strings.HasPrefix $p "http://") (strings.HasPrefix $p "https://") -}}
+{{- $p -}}
+{{- else -}}
+{{- $p | relURL -}}
+{{- end -}}

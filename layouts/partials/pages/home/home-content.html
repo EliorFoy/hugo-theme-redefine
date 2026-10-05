@@ -1,0 +1,15 @@
+{{- /* Home article list — port of pages/home/home-content.ejs. Input: dict ctx/paginator */ -}}
+{{- $theme := site.Params -}}
+{{- $paginator := .paginator -}}
+{{- $ctx := .ctx -}}
+<div class="home-content-container">
+    <ul class="home-article-list">
+        {{- range $post := $paginator.Pages }}
+            {{- partial "pages/home/home-article-item.html" (dict "ctx" $ctx "post" $post) }}
+        {{- end }}
+    </ul>
+
+    <div class="home-paginator px-7 py-5">
+        {{- partial "utils/paginator.html" (dict "ctx" $ctx "paginator" $paginator) }}
+    </div>
+</div>

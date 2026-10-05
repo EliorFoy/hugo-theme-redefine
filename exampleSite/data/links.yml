@@ -1,0 +1,11 @@
+- links_category: 常驻友情链接
+  has_thumbnail: false
+  list:
+    - name: Hugo
+      link: https://gohugo.io
+      avatar: ""
+      description: The world's fastest framework for building websites
+    - name: Redefine (Hexo)
+      link: https://redefine.ohevan.com
+      avatar: ""
+      description: 原版 Hexo 主题演示站

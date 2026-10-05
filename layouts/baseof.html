@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Lang | default `en` }}">
+{{- partial "head.html" . }}
+
+<body>
+	{{- block "main" . }}{{ end }}
+	{{- partial "scripts.html" . }}
+	{{- if site.Params.plugins.aplayer.enable }}
+	{{- partial "plugins/aplayer.html" . }}
+	{{- end }}
+</body>
+
+</html>

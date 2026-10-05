@@ -1,0 +1,60 @@
+{{- /*
+  {% button %} — port of scripts/modules/button.js.
+  Named:   {{< button text="My Button" url="https://example.com" icon="fa-solid fa-star" size="lg" align="center" >}}
+  Simple:  {{< button "My Button" "https://example.com" "fa-solid fa-star" >}}
+*/ -}}
+{{- $text := "" -}}
+{{- $url := "" -}}
+{{- $iconClass := "" -}}
+{{- $imageSrc := "" -}}
+{{- $size := "md" -}}
+{{- $align := "inline" -}}
+{{- $title := "" -}}
+{{- $target := "" -}}
+{{- $rel := "" -}}
+
+{{- if .sc.IsNamedParams -}}
+  {{- $text = string (.sc.Get "text" | default (.sc.Get "label") | default (.sc.Get 0) | default "") -}}
+  {{- $url = string (.sc.Get "url" | default (.sc.Get "href") | default (.sc.Get 1) | default "") -}}
+  {{- $namedIcon := string (.sc.Get "icon" | default "") -}}
+  {{- $namedImage := string (.sc.Get "image" | default (.sc.Get "img") | default "") -}}
+  {{- $fallbackVisual := string (.sc.Get 2 | default "") -}}
+  {{- if $namedImage }}{{ $imageSrc = $namedImage }}
+  {{- else if $namedIcon }}{{ $iconClass = $namedIcon }}
+  {{- else if $fallbackVisual }}
+    {{- if or (strings.HasPrefix $fallbackVisual "http") (strings.HasPrefix $fallbackVisual "/") (findRE "\\.(png|jpe?g|gif|webp|svg|avif)$" (lower $fallbackVisual)) }}
+      {{- $imageSrc = $fallbackVisual -}}
+    {{- else }}{{ $iconClass = $fallbackVisual }}{{ end -}}
+  {{- end -}}
+  {{- $size = lower (string (.sc.Get "size" | default (.sc.Get 3) | default "md")) -}}
+  {{- $align = lower (string (.sc.Get "align" | default (.sc.Get 4) | default "inline")) -}}
+  {{- $title = string (.sc.Get "title" | default $text) -}}
+  {{- $target = string (.sc.Get "target" | default "") -}}
+  {{- $rel = string (.sc.Get "rel" | default "") -}}
+{{- else -}}
+  {{- $args := slice -}}
+  {{- range $a := .sc.Params }}{{ $args = $args | append (string $a) }}{{ end -}}
+  {{- if eq (len $args) 1 }}{{ $text = index $args 0 }}
+  {{- else if eq (len $args) 2 }}{{ $text = index $args 0 }}{{ $url = index $args 1 }}
+  {{- else if eq (len $args) 3 }}{{ $text = index $args 0 }}{{ $url = index $args 1 }}{{ $fallback := index $args 2 }}
+    {{- if or (strings.HasPrefix $fallback "http") (strings.HasPrefix $fallback "/") (findRE "\\.(png|jpe?g|gif|webp|svg|avif)$" (lower $fallback)) }}
+      {{- $imageSrc = $fallback -}}
+    {{- else }}{{ $iconClass = $fallback }}{{ end -}}
+  {{- end -}}
+  {{- $title = $text -}}
+{{- end -}}
+
+{{- $sizeClass := "" -}}
+{{- if or (eq $size "sm") (eq $size "small") }}{{ $sizeClass = "small" }}
+{{- else if or (eq $size "lg") (eq $size "large") }}{{ $sizeClass = "large" }}{{ end -}}
+{{- $alignClass := "" -}}
+{{- if in (slice "left" "center" "right") $align }}{{ $alignClass = $align }}{{ end -}}
+{{- if not $text }}{{ $text = "Button" }}{{ end -}}
+{{- $relAttr := $rel -}}
+{{- if and (not $relAttr) (eq $target "_blank") }}{{ $relAttr = "noopener noreferrer" }}{{ end -}}
+{{- $visual := "" -}}
+{{- if $iconClass }}{{ $visual = printf `<i class="%s" aria-hidden="true"></i>` $iconClass }}
+{{- else if $imageSrc }}{{ $visual = printf `<img src="%s" alt="%s" loading="lazy">` $imageSrc $text }}{{ end -}}
+<a class="button not-markdown {{ $sizeClass }} {{ $alignClass }}"{{ with $url }} href="{{ . }}"{{ end }} title="{{ $title }}"{{ with $target }} target="{{ . }}"{{ end }}{{ with $relAttr }} rel="{{ . }}"{{ end }}>
+  {{ if $visual }}{{ $visual | safeHTML }} {{ end }}{{ $text }}
+</a>

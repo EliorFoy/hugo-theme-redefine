@@ -1,0 +1,78 @@
+{{- /*
+  {% callout %} — port of scripts/modules/callout.js.
+  Simple:    {{< callout info >}} markdown body {{< /callout >}}
+  Titled:    {{< callout type="info" title="Hello" icon="fa-solid fa-lightbulb" class="extra" >}} ... {{< /callout >}}
+  Delimiter: {{< callout info :: Hello >}} ... {{< /callout >}}
+*/ -}}
+{{- $positional := .sc.Params -}}
+{{- $isNamed := .sc.IsNamedParams -}}
+
+{{- $type := "default" -}}
+{{- $title := "" -}}
+{{- $iconClass := "" -}}
+{{- $extraClasses := slice -}}
+{{- $variant := "simple" -}}
+
+{{- if $isNamed -}}
+  {{- $type = string (.sc.Get "type" | default "default") -}}
+  {{- $title = string (.sc.Get "title" | default "") -}}
+  {{- $iconClass = string (.sc.Get "icon" | default "") -}}
+  {{- $variant = string (.sc.Get "variant" | default "simple") -}}
+  {{- $cls := string (.sc.Get "class" | default (.sc.Get "classes")) -}}
+  {{- range $c := (split $cls " ") }}{{ if $c }}{{ $extraClasses = $extraClasses | append $c }}{{ end }}{{ end -}}
+  {{- if or (eq $variant "titled") (ne $title "") }}{{ $variant = "titled" }}{{ else }}{{ $variant = "simple" }}{{ end -}}
+{{- else -}}
+  {{- /* positional: [type, ...icon/fa tokens, "::", title tokens...] */ -}}
+  {{- $args := slice -}}
+  {{- range $a := $positional }}{{ $args = $args | append (string $a) }}{{ end -}}
+  {{- if gt (len $args) 0 }}{{ $type = index $args 0 }}{{ $args = $args | after 1 }}{{ end -}}
+  {{- /* split at :: delimiter */ -}}
+  {{- $delimIdx := -1 -}}
+  {{- range $i, $a := $args }}{{ if and (eq $delimIdx -1) (eq $a "::") }}{{ $delimIdx = $i }}{{ end }}{{ end -}}
+  {{- if ge $delimIdx 0 -}}
+    {{- $titleParts := slice -}}
+    {{- range $i, $a := $args }}{{ if gt $i $delimIdx }}{{ $titleParts = $titleParts | append $a }}{{ end }}{{ end -}}
+    {{- $title = strings.TrimSpace (delimit $titleParts " ") -}}
+    {{- $args = first $delimIdx $args -}}
+    {{- $variant = "titled" -}}
+  {{- end -}}
+  {{- /* icon tokens: first non-style fa- token + optional style token */ -}}
+  {{- $style := "" -}}
+  {{- $icon := "" -}}
+  {{- $rest := slice -}}
+  {{- range $a := $args -}}
+    {{- if and (strings.HasPrefix $a "fa-") (in (slice "fa-solid" "fa-regular" "fa-light" "fa-thin" "fa-duotone" "fa-brands" "fa-sharp" "fa-sharp-solid") $a) -}}
+      {{- if not $style }}{{ $style = $a }}{{ end -}}
+    {{- else if and (strings.HasPrefix $a "fa-") (not $icon) -}}
+      {{- $icon = $a -}}
+    {{- else -}}
+      {{- $rest = $rest | append $a -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $icon }}{{ $iconClass = printf "%s %s" (default "fa-solid" $style) $icon }}{{ end -}}
+  {{- $extraClasses = $rest -}}
+{{- end -}}
+
+{{- $renderedContent := .sc.Page.RenderString .inner -}}
+{{- $iconMarkup := "" -}}
+{{- if $iconClass }}{{ $iconMarkup = printf `<i class="callout__icon %s leading-none text-(--callout-primary-color) text-sm shrink-0"></i>` $iconClass }}{{ end -}}
+
+{{- if eq $variant "titled" -}}
+  {{- $renderedTitle := strings.TrimSpace (.sc.Page.RenderString (default "Note" $title)) -}}
+  {{- $renderedTitle = replaceRE "^<p>([\\s\\S]*)</p>$" "$1" $renderedTitle -}}
+  {{- $titleInner := $renderedTitle -}}
+  {{- if $iconMarkup }}{{ $titleInner = printf "%s %s" $iconMarkup $renderedTitle }}{{ end -}}
+<div class="callout callout--titled {{ $type }}{{ range $c := $extraClasses }} {{ $c }}{{ end }} mb-4 rounded-small shadow-redefine-flat bg-(--callout-bg-color) p-3 pl-1 relative flex flex-row gap-2">
+  <div role="none" class="rounded-full self-stretch w-0.5 bg-(--callout-primary-color) shrink-0 opacity-60"></div>
+  <div class="flex flex-col gap-2">
+    <div class="callout__title flex items-center gap-2 font-semibold tracking-tight">{{ $titleInner | safeHTML }}</div>
+    <div class="callout__content markdown-body flex-1 min-w-0">{{ $renderedContent | safeHTML }}</div>
+  </div>
+</div>
+{{- else -}}
+<div class="callout callout--simple {{ $type }}{{ range $c := $extraClasses }} {{ $c }}{{ end }} mb-4 rounded-small shadow-redefine-flat bg-(--callout-bg-color) p-3 pl-1 relative flex flex-row gap-2 items-center">
+  <div role="none" class="rounded-full self-stretch w-0.5 bg-(--callout-primary-color) shrink-0 opacity-60"></div>
+  {{ $iconMarkup | safeHTML }}
+  <div class="callout__content markdown-body flex-1 min-w-0">{{ $renderedContent | safeHTML }}</div>
+</div>
+{{- end -}}

@@ -1,0 +1,8 @@
+{{/*
+  Returns the site's regular post pages (excluding themed special pages).
+*/}}
+{{- $sec := site.Params.posts_section | default "posts" -}}
+{{- $bySection := where site.RegularPages "Section" $sec -}}
+{{- $byType := where site.RegularPages "Params.type" "post" -}}
+{{- $posts := union $bySection $byType -}}
+{{- return ($posts.ByDate.Reverse) -}}

@@ -1,0 +1,6 @@
+{{- /* Archive page — port of pages/archive/archive.ejs. Input: dict ctx/paginator */ -}}
+{{- $ctx := .ctx -}}
+{{- $posts := partial "posts.html" $ctx -}}
+<div class="archive-container shadow-none hover:shadow-none sm:shadow-redefine sm:hover:shadow-redefine-hover">
+	{{- partial "utils/posts-list.html" (dict "ctx" $ctx "posts" $posts) }}
+</div>

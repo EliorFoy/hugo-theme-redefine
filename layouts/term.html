@@ -1,0 +1,5 @@
+{{ define "main" }}
+{{- $partialName := "pages/tag/tag-detail" }}
+{{- if eq .Data.Singular "category" }}{{ $partialName = "pages/category/category-detail" }}{{ end }}
+{{- partial "page-container.html" (dict "ctx" . "partial" $partialName) }}
+{{ end }}

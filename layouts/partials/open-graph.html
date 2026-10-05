@@ -1,0 +1,36 @@
+{{- /* Open Graph meta tags, mirrors the hexo open_graph helper output */ -}}
+{{- $ctx := .ctx -}}
+{{- $ogConfig := .ogConfig -}}
+{{- $siteTitle := .title -}}
+{{- $ogImage := $ctx.Params.og_image | default $ogConfig.image | default "/images/redefine-og.webp" -}}
+{{- $ogDescription := $ctx.Params.og_description | default $ogConfig.description | default $ctx.Description | default site.Params.description -}}
+{{- $ogTitle := $ctx.Title | default $siteTitle -}}
+{{- $ogImageUrl := $ogImage -}}
+{{- if and $ogImage (not (or (strings.HasPrefix $ogImage "http://") (strings.HasPrefix $ogImage "https://"))) -}}
+  {{- $ogImageUrl = $ogImage | absURL -}}
+{{- end -}}
+{{- $ogType := "website" -}}
+{{- if $ctx.IsPage }}{{ $ogType = "article" }}{{ end -}}
+<meta property="og:type" content="{{ $ogType }}">
+<meta property="og:title" content="{{ $ogTitle }}">
+{{- if $ctx.Permalink }}
+<meta property="og:url" content="{{ $ctx.Permalink }}">
+{{- end }}
+<meta property="og:site_name" content="{{ $siteTitle }}">
+<meta property="og:description" content="{{ $ogDescription }}">
+<meta property="og:locale" content="{{ replace (site.Language.Lang | default "en") "-" "_" }}">
+{{- with $ogImageUrl }}
+<meta property="og:image" content="{{ . }}">
+{{- end }}
+{{- if and $ctx.IsPage $ctx.Date }}
+<meta property="article:published_time" content="{{ $ctx.Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+{{- if and $ctx.IsPage $ctx.Lastmod }}
+<meta property="article:modified_time" content="{{ $ctx.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ $ogTitle }}">
+<meta name="twitter:description" content="{{ $ogDescription }}">
+{{- with $ogImageUrl }}
+<meta name="twitter:image" content="{{ . }}">
+{{- end }}

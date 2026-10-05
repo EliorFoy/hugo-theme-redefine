@@ -1,0 +1,25 @@
+{{- /* Generic page template — port of pages/page-template.ejs. Input: dict ctx/paginator */ -}}
+{{- $ctx := .ctx -}}
+{{- $paginator := .paginator -}}
+{{- $data := partial "page-data.html" $ctx -}}
+<div class="page-template-container">
+	{{- if $data }}
+	{{- partial $data.partial (dict "ctx" $ctx "paginator" $paginator) }}
+	{{- end }}
+
+	<div class="page-template-content markdown-body">
+		{{- if not $data }}
+		<h1>{{- $ctx.Title -}}</h1>
+		{{- end }}
+
+		{{- $ctx.Content -}}
+	</div>
+
+	<div class="page-template-comments">
+		{{- if or (eq ($ctx.Params.comment | default false) true) (eq ($ctx.Params.comments | default false) true) }}
+		{{- partial "components/comments/comment.html" $ctx }}
+		{{- end }}
+	</div>
+</div>
+
+{{- partial "utils/paginator.html" (dict "ctx" $ctx "paginator" $paginator) -}}

@@ -1,0 +1,35 @@
+{{- /*
+  {% folding %} — port of scripts/modules/folding.js.
+  {{< folding title="Click me" open=true >}} markdown body {{< /folding >}}
+  Legacy positional: {{< folding "style-class::Title" >}} or "style,Title"
+*/ -}}
+{{- $title := "" -}}
+{{- $open := false -}}
+{{- $className := "" -}}
+
+{{- if .sc.IsNamedParams -}}
+  {{- $title = string (.sc.Get "title" | default "") -}}
+  {{- $open = in (slice "true" "1" "yes" "on") (lower (string (.sc.Get "open" | default "false"))) -}}
+  {{- $className = string (.sc.Get "class" | default (.sc.Get "classes") | default (.sc.Get "style")) -}}
+  {{- if not $title }}{{ $title = string (.sc.Get 0 | default "") }}{{ end -}}
+{{- else -}}
+  {{- $args := slice -}}
+  {{- range $a := .sc.Params }}{{ $args = $args | append (string $a) }}{{ end -}}
+  {{- $raw := strings.TrimSpace (delimit $args " ") -}}
+  {{- $parts := slice -}}
+  {{- if in $raw "::" }}{{ $parts = split $raw "::" }}
+  {{- else if in $raw "," }}{{ $parts = split $raw "," }}
+  {{- else }}{{ $parts = slice $raw }}{{ end -}}
+  {{- $className = strings.TrimSpace (index $parts 0 | default "") -}}
+  {{- if gt (len $parts) 1 }}{{ $title = strings.TrimSpace (index $parts 1) }}{{ end -}}
+{{- end -}}
+
+{{- $rendered := .sc.Page.RenderString .inner -}}
+{{- $rendered = replaceRE "<(h[1-6])>" "<p class='$1'>" $rendered -}}
+{{- $rendered = replaceRE "</(h[1-6])>" "</p>" $rendered -}}
+<details class="relative my-4 border border-border-color bg-second-background-color rounded-md {{ $className }}"{{ if $open }} open{{ end }} data-header-exclude>
+  <summary class="px-4 py-2 rounded-md shadow-[0_0_2px_0_var(--shadow-color-1)] cursor-pointer not-markdown"><i class="fa-solid fa-chevron-right"></i>{{ $title }} </summary>
+  <div class="content p-4 ">
+    {{ $rendered | safeHTML }}
+  </div>
+</details>

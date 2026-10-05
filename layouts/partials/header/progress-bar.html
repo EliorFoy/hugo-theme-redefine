@@ -1,0 +1,9 @@
+<div class="progress-bar-container">
+	{{- if site.Params.global.scroll_progress.bar }}
+	<span class="scroll-progress-bar"></span>
+	{{- end }}
+
+	{{- if site.Params.global.single_page }}
+	<span class="pjax-progress-bar"></span>
+	{{- end }}
+</div>

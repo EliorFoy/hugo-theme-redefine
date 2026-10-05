@@ -1,0 +1,26 @@
+{{/*
+  Converts a moment.js-style layout token (YYYY-MM-DD HH:mm:ss) to a Go layout.
+*/}}
+{{- $f := string . -}}
+{{- if not $f }}{{ $f = "YYYY-MM-DD" }}{{ end -}}
+{{- $g := $f
+  | replaceRE "YYYY" "2006"
+  | replaceRE "YY" "06"
+  | replaceRE "MMM" "Jan"
+  | replaceRE "MM" "01"
+  | replaceRE "DDDD" "002"
+  | replaceRE "DD" "02"
+  | replaceRE "HH" "15"
+  | replaceRE "hh" "03"
+  | replaceRE "mm" "04"
+  | replaceRE "ss" "05"
+  | replaceRE "A" "PM"
+  | replaceRE "a" "pm"
+  | replaceRE "M" "1"
+  | replaceRE "D" "2"
+  | replaceRE "H" "15"
+  | replaceRE "h" "3"
+  | replaceRE "m" "4"
+  | replaceRE "s" "5"
+-}}
+{{- return $g -}}

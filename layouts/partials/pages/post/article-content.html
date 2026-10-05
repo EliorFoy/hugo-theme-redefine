@@ -1,0 +1,137 @@
+{{- /* Article page — port of pages/post/article-content.ejs. Input: dict ctx/paginator (ctx = the post) */ -}}
+{{- $ctx := .ctx -}}
+{{- $theme := site.Params -}}
+{{- $author := $theme.info.author | default site.Params.author | default site.Title -}}
+{{- if $ctx.Params.author }}{{ $author = $ctx.Params.author }}{{ end -}}
+{{- $posts := partial "posts.html" $ctx -}}
+{{- $content := $ctx.Content -}}
+{{- if $theme.articles.style.delete_mask }}
+  {{- $content = replace $content "<del>" "<del class=\"mask\">" -}}
+{{- end -}}
+<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			{{- $articleCover := "" -}}
+			{{- if $ctx.Params.cover }}{{ $articleCover = $ctx.Params.cover }}
+			{{- else if $ctx.Params.banner }}{{ $articleCover = $ctx.Params.banner }}
+			{{- else if and $ctx.Params.thumbnail (ne (string $ctx.Params.thumbnail) "false") }}{{ $articleCover = $ctx.Params.thumbnail }}{{ end -}}
+			{{- if and $articleCover (not (strings.Contains $articleCover "/")) }}
+				{{- $articleCover = path.Join ($ctx.RelPermalink | strings.TrimSuffix "/") $articleCover -}}
+			{{- end }}
+			{{- with $articleCover }}
+			<img src="{{ partial "url-for.html" . }}" alt="{{ $ctx.Title }}" class="w-full h-60 sm:h-72 md:h-80 object-cover rounded-t-large dark:brightness-75" />
+			<div class="w-full flex items-center absolute bottom-0 {{ if eq $theme.articles.style.title_alignment "center" }}justify-center{{ else }}justify-start{{ end }}">
+				<h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-semibold backdrop-blur-lg rounded-xl border border-border-color ">{{ $ctx.Title }}</h1>
+			</div>
+			{{- else }}
+			<div class="w-full flex items-center pt-6 {{ if eq $theme.articles.style.title_alignment "center" }}justify-center{{ else }}justify-start{{ end }}">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">{{ $ctx.Title }}</h1>
+			</div>
+			{{- end }}
+		</div>
+
+		{{- if $author }}
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] shrink-0 rounded-medium border border-border-color p-px">
+				<img src="{{ partial "url-for.html" ($ctx.Params.avatar | default $theme.defaults.avatar) }}" alt="{{ $author }}">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">{{ $author }}</span>
+					{{- if $theme.articles.author_label.enable }}
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">{{ partial "get-author-label.html" (dict "postCount" (len $posts) "auto" $theme.articles.author_label.auto "list" $theme.articles.author_label.list) }}</span>
+					{{- end }}
+				</div>
+				<div class="meta-info">
+					{{- partial "pages/post/article-info.html" (dict "ctx" $ctx "article" $ctx "index" true) }}
+				</div>
+			</div>
+		</div>
+		{{- else }}
+		<div class="article-header-meta-info px-2 sm:px-6 md:px-8">
+			<div class="meta-info">
+				{{- partial "pages/post/article-info.html" (dict "ctx" $ctx "article" $ctx "index" true) }}
+			</div>
+		</div>
+		{{- end }}
+
+		{{- with $ctx.Params.expires }}
+		<div class="article-expire hidden mt-4 mx-2 sm:mx-6 md:mx-8 callout callout--simple red mb-4 rounded-small shadow-redefine-flat bg-(--callout-bg-color) p-3 pl-1 relative flex flex-row gap-2 items-center" id="expiration-container" data-expires="{{ . }}" data-updated="{{ $ctx.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+			<div role="none" class="rounded-full self-stretch w-0.5 bg-(--callout-primary-color) opacity-60 shrink-0"></div>
+			<i class="expire-icon callout__icon fa-solid fa-timer text-(--callout-primary-color) text-base shrink-0"></i>
+			<div class="callout__content markdown-body flex-1 min-w-0">
+				<span class="expire-label text-(--callout-primary-color)" id="expiration-date">{{ i18n "expired" "some" }}</span>
+			</div>
+		</div>
+		{{- end }}
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			{{- $content -}}
+		</div>
+
+		{{- if $theme.articles.copyright.enable }}
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			{{- partial "pages/post/article-copyright.html" (dict "ctx" $ctx) }}
+		</div>
+		{{- end }}
+
+		{{- $tags := $ctx.GetTerms "tags" -}}
+		{{- if gt (len $tags) 0 }}
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			{{- range $tag := $tags }}
+			<li class="tag-item mx-0.5">
+				<a href="{{ $tag.RelPermalink }}">#{{ $tag.LinkTitle }}</a>&nbsp;
+			</li>
+			{{- end }}
+		</ul>
+		{{- end }}
+
+		{{- partial "article-recommendation.html" $ctx }}
+
+		{{- if or $ctx.Next $ctx.Prev }}
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			{{- with $ctx.Next }}
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="{{ .RelPermalink }}">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">{{ .Title }}</span>
+						<span class="post-nav-item">{{- i18n "prev_posts" -}}</span>
+					</span>
+				</a>
+			</div>
+			{{- end }}
+			{{- with $ctx.Prev }}
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="{{ .RelPermalink }}">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">{{ .Title }}</span>
+						<span class="post-nav-item">{{- i18n "next_posts" -}}</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			{{- end }}
+		</div>
+		{{- end }}
+
+
+		{{- if and $theme.comment.enable (ne $theme.comment.system "") (ne ($ctx.Params.comment | default true) false) }}
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			{{- partial "components/comments/comment.html" $ctx }}
+		</div>
+		{{- end }}
+	</div>
+
+	{{- if and $theme.articles.toc.enable }}
+	<div class="toc-content-container">
+		{{- partial "pages/post/toc.html" $ctx }}
+	</div>
+	{{- end }}
+</div>

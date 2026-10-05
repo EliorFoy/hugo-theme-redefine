@@ -1,0 +1,7 @@
+{{- /* robots meta, port of generateMeta helper */ -}}
+{{- $theme := site.Params -}}
+{{- $robots := "" -}}
+{{- if .Params.robots -}}
+  {{- $robots = .Params.robots -}}
+{{- end -}}
+{{- if $robots }}<meta name="robots" content="{{ $robots }}">{{ end -}}

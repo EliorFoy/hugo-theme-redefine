@@ -1,0 +1,27 @@
+{{- /* Masonry (gallery) page — port of pages/masonry/masonry.ejs. Data from data/masonry.yml */ -}}
+{{- $ctx := .ctx -}}
+{{- $theme := site.Params -}}
+{{- $masonryEntries := hugo.Data.masonry | default hugo.Data.gallery | default hugo.Data.photos
+    | default (hugo.Data.redefine.masonry | default hugo.Data.redefine.gallery | default hugo.Data.redefine.photos)
+    | default slice -}}
+{{- $hasExif := false -}}
+{{- range $entry := $masonryEntries -}}
+  {{- if and (reflect.IsMap $entry) (eq ($entry.exif | default false) true) }}{{ $hasExif = true }}{{ end -}}
+{{- end -}}
+<div class="py-8 sm:py-0">
+	<h1 class="page-title-header">
+		{{- $ctx.Title | default (i18n "tagcloud") -}}
+	</h1>
+
+	<div class="min-h-screen!" id="masonry-container" data-masonry-data-url="{{ printf "%sdata.json" .ctx.RelPermalink }}"></div>
+
+	<div class="masonry-loadmore is-hidden" id="masonry-loadmore" aria-live="polite">
+		<span class="masonry-spinner" aria-hidden="true"></span>
+		<span class="masonry-loadmore-text">{{- i18n "masonry_loading" -}}</span>
+	</div>
+
+	<div id="masonry-sentinel" aria-hidden="true"></div>
+</div>
+{{- if $hasExif }}
+	<script{{ if $theme.global.single_page }} data-swup-reload-script{{ end }} src="{{ "js/build/libs/exif-reader.js" | relURL }}"></script>
+{{- end }}

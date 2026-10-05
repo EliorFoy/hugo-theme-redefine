@@ -1,0 +1,74 @@
+{{- /* Article meta info — port of pages/post/article-info.ejs. Input: dict ctx/article/index */ -}}
+{{- $ctx := .ctx -}}
+{{- $article := .article -}}
+{{- $theme := site.Params -}}
+{{- $isPost := partial "is-post.html" $ctx -}}
+{{- $fmt := site.Params.date_format | default "YYYY-MM-DD" -}}
+{{- $fullFmt := printf "%s %s" $fmt (site.Params.time_format | default "HH:mm:ss") -}}
+{{- $dateFormat := $fmt -}}
+{{- if $isPost }}{{ $dateFormat = $fullFmt }}{{ end -}}
+{{- $dateStr := partial "date-fmt.html" (dict "t" $article.Date "fmt" $dateFormat) -}}
+{{- $dateStr = strings.TrimSuffix ":00" (strings.TrimSuffix " 00:00:00" $dateStr) -}}
+{{- $updatedStr := partial "date-fmt.html" (dict "t" $article.Lastmod "fmt" $dateFormat) -}}
+{{- $updatedStr = strings.TrimSuffix ":00" (strings.TrimSuffix " 00:00:00" $updatedStr) -}}
+<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">{{ $dateStr }}</span>
+        <span class="mobile">{{ $dateStr }}</span>
+        <span class="hover-info">{{- i18n "create_time" -}}</span>
+    </span>
+    {{- if and $article.Lastmod (ne ($article.Lastmod.Format "2006-01-02T15:04:05Z07:00") ($article.Date.Format "2006-01-02T15:04:05Z07:00")) }}
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">{{ $updatedStr }}</span>
+            <span class="mobile">{{ $updatedStr }}</span>
+            <span class="hover-info">{{- i18n "update_time" -}}</span>
+        </span>
+    {{- end }}
+
+    {{- $cats := $article.GetTerms "categories" -}}
+    {{- if gt (len $cats) 0 }}
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                {{- range $i, $cat := $cats }}
+                    {{- if gt $i 0 }}<li>|</li>{{ end }}
+                    <li>
+                        <a href="{{ $cat.RelPermalink }}">{{ $cat.LinkTitle }}</a>&nbsp;
+                    </li>
+                {{- end }}
+            </ul>
+        </span>
+    {{- end }}
+    {{- $tags := $article.GetTerms "tags" -}}
+    {{- if gt (len $tags) 0 }}
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                {{- range $i, $tag := $tags }}
+                    <li>
+                        {{- if gt $i 0 }}| {{ end }}<a href="{{ $tag.RelPermalink }}">{{ $tag.LinkTitle }}</a>&nbsp;
+                    </li>
+                {{- end }}
+            </ul>
+        </span>
+    {{- end }}
+
+    {{- $wordcount := partial "wordcount.html" $article -}}
+    {{- if and $isPost $theme.articles.word_count.enable $theme.articles.word_count.count }}
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>{{ $wordcount }} {{- i18n "wordcount" -}}</span>
+        </span>
+    {{- end }}
+    {{- if and $isPost $theme.articles.word_count.enable $theme.articles.word_count.min2read }}
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>{{ partial "min2read.html" $wordcount }} {{- i18n "min2read" -}}</span>
+        </span>
+    {{- end }}
+    {{- if and $isPost $theme.global.website_counter.enable $theme.global.website_counter.post_pv }}
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    {{- end }}
+</div>

@@ -1,0 +1,5 @@
+{{ define "main" }}
+{{- $posts := partial "posts.html" . }}
+{{- $paginator := .Paginate $posts }}
+{{- partial "page-container.html" (dict "ctx" . "partial" "pages/home/home-content" "paginator" $paginator) }}
+{{ end }}

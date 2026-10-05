@@ -1,0 +1,54 @@
+{{/*
+  Exports theme config to the client JS — port of scripts/config-export.js.
+  Produces window.config / window.theme / window.lang_ago / window.i18n / window.data
+*/}}
+{{- $theme := site.Params -}}
+{{- $siteURL := urls.Parse (site.BaseURL) -}}
+{{- $hostname := $siteURL.Hostname -}}
+
+{{/* build window.theme (same keys as hexo export_config, plus data-file driven extras) */}}
+{{- $langKey := replace (lower (site.Language.Lang | default "en")) "-" "" -}}
+{{- $langData := index hugo.Data.redefine.i18n $langKey -}}
+{{- if not $langData }}{{ $langData = index hugo.Data.redefine.i18n "en" }}{{ end -}}
+
+{{- $subtitle := $theme.home_banner.subtitle -}}
+{{- $subtitleText := $subtitle.text -}}
+{{- if not $subtitleText }}{{ $subtitleText = slice }}{{ end -}}
+{{- if eq (printf "%T" $subtitleText) "string" }}{{ $subtitleText = slice $subtitleText }}{{ end }}
+
+{{- $mermaidTheme := $theme.plugins.mermaid.theme -}}
+
+{{- $t := dict
+  "articles" $theme.articles
+  "colors" $theme.colors
+  "global" $theme.global
+  "home_banner" (merge $theme.home_banner (dict "subtitle" (merge $subtitle (dict "text" $subtitleText))))
+  "plugins" (merge $theme.plugins (dict "mermaid" (merge $theme.plugins.mermaid (dict "theme" $mermaidTheme))))
+  "version" $theme.theme_internal.version
+  "code_block" $theme.articles.code_block
+  "navbar" $theme.navbar
+  "page_templates" $theme.page_templates
+  "home" $theme.home
+  "footer" $theme.footer
+  "footerStart" $theme.footer.start
+  "mermaid" (dict "style" $mermaidTheme)
+  "bookmarks" (hugo.Data.redefine.bookmarks | default hugo.Data.bookmarks)
+  "masonry" (hugo.Data.redefine.masonry | default hugo.Data.masonry)
+  "links" (hugo.Data.redefine.links | default hugo.Data.links)
+  "essays" (hugo.Data.redefine.essays | default hugo.Data.essays)
+-}}
+
+{{- $c := dict
+  "hostname" $hostname
+  "root" (default "/" (strings.TrimSuffix "/" (urls.Parse site.BaseURL).Path))
+  "language" (site.Language.Lang | default "en")
+  "path" "search.xml"
+-}}
+
+<script id="hexo-configurations">
+    window.config = {{ $c | jsonify | safeJS }};
+    window.theme = {{ $t | jsonify | safeJS }};
+    window.lang_ago = {{ (index $langData "ago") | jsonify | safeJS }};
+    window.i18n = {{ $langData | jsonify | safeJS }};
+    window.data = { "masonry": false };
+</script>

@@ -1,0 +1,19 @@
+{{- /*
+  Link render hook — ports the external-link-icon Hexo filter:
+  external links get class="link" and an arrow icon appended.
+*/ -}}
+{{- $theme := site.Params -}}
+{{- $dest := .Destination -}}
+{{- $u := urls.Parse $dest -}}
+{{- $siteHost := urls.Parse (site.BaseURL) -}}
+{{- $external := false -}}
+{{- if and $u.Scheme (or (eq $u.Scheme "http") (eq $u.Scheme "https")) (ne $u.Host $siteHost.Host) -}}
+  {{- $external = true -}}
+{{- end -}}
+{{- if and $external $theme.articles.style.link_icon -}}
+<a class="link" href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>
+{{- else if $external -}}
+<a class="link" href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}</a>
+{{- else -}}
+<a href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}</a>
+{{- end -}}
