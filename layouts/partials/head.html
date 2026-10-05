@@ -167,13 +167,35 @@
     <link rel="stylesheet" href="{{ "fonts/Geist/geist.css" | relURL }}">
     {{- partial "css-overrides.html" . }}
 
-    {{- /* KaTeX CSS (engine of the original markdown-it-katex setup) plus the
-          adapter for Hugo ToMath's renamed structural classes. Loaded only on
-          pages containing math. */ -}}
+    {{- /* KaTeX math support (engine of the original markdown-it-katex setup):
+          inline math is rendered at build time via transform.ToMath; display
+          blocks are wrapped by the migration converter and rendered client
+          side with KaTeX auto-render. Both load on math pages only. */ -}}
     {{- $noop := .WordCount -}}
-    {{- if .Store.Get "hasMath" }}
+    {{- if or (.Params.mathjax) (.Store.Get "hasMath") }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ "css/katex-tomath.css" | relURL }}">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+    <script>
+        (function () {
+            var render = function () {
+                if (window.renderMathInElement) {
+                    window.renderMathInElement(document.body, {
+                        delimiters: [
+                            { left: '$$', right: '$$', display: true },
+                            { left: '$', right: '$', display: false }
+                        ],
+                        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option'],
+                        ignoredClasses: ['katex'],
+                        throwOnError: false
+                    });
+                }
+            };
+            document.addEventListener('DOMContentLoaded', render);
+            document.addEventListener('swup:page:view', render);
+        })();
+    </script>
     {{- end }}
     <!--- Font Part-->
     {{- if $theme.home_banner.custom_font.enable }}
