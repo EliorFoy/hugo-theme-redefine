@@ -1,9 +1,22 @@
+<div align="center">
+
 # Hugo Theme Redefine
 
-> 从 Hexo 主题 [hexo-theme-redefine](https://github.com/EvanNotFound/hexo-theme-redefine)（v2.9.0）**完整迁移**而来的 Hugo 主题。
-> 视觉与交互尽量与原版保持 1:1，配置结构也与 Hexo 版本保持一致，方便既有用户直接平移。
+**Redefine your writing with Hugo.**
 
-![license](https://img.shields.io/badge/license-GPL--3.0-blue)
+[EvanNotFound 的 hexo-theme-redefine](https://github.com/EvanNotFound/hexo-theme-redefine)（v2.9.0）的 Hugo 完整移植版
+
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Hugo](https://img.shields.io/badge/Hugo-%E2%89%A5%200.146.0-ff4088.svg)](https://gohugo.io/)
+[![Original Theme](https://img.shields.io/badge/Original-hexo--theme--redefine-8A2BE2.svg)](https://github.com/EvanNotFound/hexo-theme-redefine)
+
+</div>
+
+---
+
+> **声明**
+>
+> 本主题是 [EvanNotFound](https://github.com/EvanNotFound) 的 Hexo 主题 [hexo-theme-redefine](https://github.com/EvanNotFound/hexo-theme-redefine) 的 Hugo 移植版。模板、样式、脚本与交互均移植自原项目，视觉与配置结构尽量保持一致。原项目以 **GPL-3.0** 协议开源，本移植版同样以 GPL-3.0 发布，并保留原项目的版权声明。
 
 ## 特性
 
@@ -13,6 +26,7 @@
 - 📑 文章 TOC（可配置深度、自动编号、随滚动高亮）
 - 💻 代码块：Hugo 内置 Chroma 服务端高亮 + 12 套原版 hljs 配色（亮色 3 套 / 暗色 9 套）、mac 风格、一键复制、折叠
 - 🧩 内容短代码：`callout` / `folding` / `tabs` / `button` / `grid`，并兼容 Hexo 旧标签 `note`、`noteL`、`btn`、`cell`、`btns` 等
+- ∑ 数学公式：KaTeX 构建期渲染（行内）+ 按需客户端渲染（块级），与原站 markdown-it-katex 观感一致
 - 🖼️ 图片懒加载、图注、外链图标（与 Hexo 版滤镜行为一致）
 - 💬 评论系统：Waline / Twikoo / Giscus / Gitalk / Utterances / Artalk
 - 📄 特殊页面模板：归档、分类、标签、友链、说说（Essays）、瀑布流相册（Masonry）、书签导航（Bookmarks）、404
@@ -26,7 +40,7 @@
 
 ```bash
 # 方式一：git submodule
-git submodule add https://github.com/your-name/hugo-theme-redefine themes/hugo-theme-redefine
+git submodule add https://github.com/EliorFoy/hugo-theme-redefine themes/hugo-theme-redefine
 
 # 方式二：直接复制本主题目录到 themes/ 下
 ```
@@ -52,6 +66,14 @@ theme = "hugo-theme-redefine"
 > hugo server --source exampleSite
 > ```
 
+## 从 Hexo 迁移
+
+- **配置**：把 `_config.redefine.yml` 的内容原样放进站点的 `config/_default/params.yaml`（键结构一致）。
+- **文章**：`source/_posts` → `content/posts`；页面 `type: categories/tags` 等改用 front matter `layout: categories/tags`；数据文件 `source/_data/*.yml` → `data/*.yml`（links/essays/masonry/bookmarks）。
+- **语言键**：Hugo 要求小写，`zh-CN` → `zh-cn`。
+- **permalink**：建议 `posts = "/:year/:month/:day/:slugorfilename/"`，与 Hexo 的“文件名作 URL”行为一致，避免同标题文章互相覆盖。
+- **数学公式**：见下文，站点配置需启用 goldmark passthrough 扩展。
+
 ## 内容写作
 
 ### 普通文章
@@ -64,11 +86,13 @@ title: 我的文章
 date: 2026-01-01T10:00:00+08:00
 description: 摘要描述
 cover: /images/cover.webp     # 封面
+thumbnail: /images/thumb.webp # 首页缩略图
 sticky: true                   # 置顶标记
 tags: [hugo]
 categories: [blog]
 copyright: "<a href='...'>自定义版权</a>"  # 可选，覆盖默认许可
 expires: 365                   # 可选，过期提醒（天）
+mathjax: true                  # 可选，启用数学公式渲染
 ---
 ```
 
@@ -102,7 +126,7 @@ expires: 365                   # 可选，过期提醒（天）
 <!-- endtab -->
 {{</* /tabs */>}}
 
-{{</* button text="按钮" url="https://example.com" icon="fa-solid fa-star" size="lg" */>}}
+{{</* button text="GitHub" url="https://github.com" icon="fa-brands fa-github" size="lg" */>}}
 
 {{</* grid cols=2 */>}}
 {{</* button text="A" url="#" */>}}
@@ -129,10 +153,9 @@ block = [['\[', '\]'], ['$$', '$$']]
 ```
 
 2. 文章 front matter 中 `mathjax: true`（沿用 Hexo 习惯的键名）。
-3. 从 Hexo 迁移时建议将 permalink 设为 `posts = "/:year/:month/:day/:slugorfilename/"`——`:title` 会基于 front matter title 生成 URL，同标题文章（如同一篇笔记的本地版与发布版）会互相覆盖；`:slugorfilename` 与 Hexo 的"文件名作 URL"行为一致。
 3. 行内公式 `$...$` 或 `\(...\)`，块级公式 `$$...$$` 或 `\[...\]`。
 
-KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。注意：Hugo 内置 KaTeX 引擎输出的 HTML 使用少量改名类（`.katex-base` 等），主题自带 `css/katex-tomath.css` 适配层将其映射回官方 KaTeX CSS 规则——**请勿移除该文件**，否则分式会错位。
+KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。注意：Hugo 内置 KaTeX 引擎输出的 HTML 使用少量改名类（`.katex-base` 等），主题自带 `css/katex-tomath.css` 适配层将其映射回官方 KaTeX CSS 规则——**请勿移除该文件**，否则分式会错位。块级公式由 KaTeX auto-render 客户端渲染（与原站注入 katex.min.js 的形态一致），Swup 切换后自动重排。
 
 ## 配置
 
@@ -166,6 +189,19 @@ path = "/archives/"
 icon = "fa-regular fa-archive"
 ```
 
+社交链接同时支持两种形态（与 Hexo 新旧格式兼容）：
+
+```toml
+[params.home_banner.social_links.links]
+github = "https://github.com/you"      # map 形式（Hexo 旧格式）
+email = "you@example.com"
+
+# 或数组形式（可自定义顺序）
+[[params.home_banner.social_links.links.list]]
+name = "GitHub"
+url = "https://github.com/you"
+```
+
 ## 与 Hexo 版的差异
 
 | Hexo 版功能 | Hugo 版处理方式 |
@@ -173,8 +209,11 @@ icon = "fa-regular fa-archive"
 | Stylus 运行时编译 | 预编译为 `static/css/style.css`；配置驱动的部分（主色、导航渐变、宽度、字号、字体等）由模板生成 CSS 变量覆盖层（`css-overrides`） |
 | highlight.js 服务端高亮 | Hugo 内置 Chroma（classes 模式）+ `chroma-adapter.css` 映射到原版 12 套 hljs 调色板 |
 | hexo-generator-searchdb | 内置自定义输出格式，生成同格式 `search.xml`，前端逻辑零改动 |
+| hexo-filter-mathjax / markdown-it-katex | 内置 KaTeX：行内构建期渲染 + 块级客户端 auto-render，含改名类适配层 |
 | 文章推荐（nodejieba TF-IDF） | Hugo 内置 Related Content（tags/categories/keywords） |
-| hexo-blog-encrypt 文章加密 | **暂未迁移**（Hugo 无法在构建期做 AES；有需求可配合服务端方案） |
+| hexo-blog-encrypt 文章加密 | 暂未迁移（Hugo 无法在构建期做 AES；有需求可配合服务端方案） |
+| hexo-all-minifier 资源压缩 | 使用 `hugo --minify` 构建即可 |
+| 首页置顶排序（sticky 值） | 置顶标记已支持；排序请用 Hugo `weight` |
 | 启动时版本检查（welcome 横幅） | 移除（与构建产物无关） |
 | `cdn` 配置 | 预留参数但未实现 CDN 替换（Hugo 主题资源本地发布即可） |
 | 语言键 `zh-CN` | Hugo 要求语言键小写：`zh-cn`、`zh-tw` |
@@ -189,7 +228,7 @@ hugo-theme-redefine/
 ├── static/              # 编译好的 CSS/JS、字体、图标（与 Hexo source/ 同构）
 │   ├── css/style.css    # Stylus 编译产物
 │   ├── css/hljs/        # 12 套 hljs 配色
-│   └── js/build/        # 原版前端 JS 构建产物
+│   └── js/build/        # 原版前端 JS 构建产物（js/ 为 developer 模式未打包源码）
 ├── i18n/                # 模板翻译（6 语言）
 ├── data/redefine/i18n/  # window.i18n 客户端翻译数据
 ├── archetypes/
@@ -198,9 +237,9 @@ hugo-theme-redefine/
 
 ## 致谢
 
-- 原主题：[EvanNotFound/hexo-theme-redefine](https://github.com/EvanNotFound/hexo-theme-redefine)（GPL-3.0）
-- 本移植遵循原许可证 GPL-3.0。
+- 原主题：[EvanNotFound/hexo-theme-redefine](https://github.com/EvanNotFound/hexo-theme-redefine)（GPL-3.0），本移植的全部视觉设计与前端交互均来自原项目
+- [Hugo](https://gohugo.io) 与 [KaTeX](https://katex.org)、[Swup](https://swup.js.org)、[Mermaid](https://mermaid.js.org) 等开源库
 
 ## License
 
-GPL-3.0
+GPL-3.0（继承自原项目），详见 [LICENSE](LICENSE)。
