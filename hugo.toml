@@ -309,6 +309,9 @@ enable = false
 type = "fixed" # fixed, mini
 # audios = [{name = "...", artist = "...", url = "...", cover = "...", lrc = "..."}]
 
+[params.plugins.mathjax]
+enable = true
+
 [params.plugins.mermaid]
 enable = false
 version = "11.4.1"
@@ -350,6 +353,12 @@ lineNos = true
 lineNumbersInTable = true
 anchorLineNos = false
 guessSyntax = false
+
+[markup.goldmark.extensions.passthrough]
+enabled = true
+[markup.goldmark.extensions.passthrough.delimiters]
+inline = [['\(', '\)']]
+block = [['\[', '\]'], ['$$', '$$']]
 
 [markup.goldmark.renderer]
 unsafe = true

@@ -10,7 +10,7 @@
   {{- $level = math.Floor (div (math.Log (float $postCount)) (math.Log 2)) -}}
   {{- if lt $level 2 }}{{ $level = 1 }}{{ else }}{{ $level = sub $level 1 }}{{ end -}}
 {{- end -}}
-{{- $label := printf "Lv%d" $level -}}
+{{- $label := printf "Lv%d" (int $level) -}}
 {{- if and (not $isAuto) (gt (len $list) 0) -}}
   {{- if gt $level (len $list) -}}
     {{- $label = index $list (sub (len $list) 1) -}}

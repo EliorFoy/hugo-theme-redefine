@@ -1,0 +1,31 @@
+{{/*
+  Normalizes home banner social links / QR drawers into a slice of
+  {name, icon, url, qr}, accepting BOTH formats:
+    map (legacy Hexo):    github: https://github.com/you
+    array (Hexo v2):      - icon: github
+                            url: https://github.com/you
+*/}}
+{{- $raw := . -}}
+{{- $items := slice -}}
+{{- if reflect.IsMap $raw -}}
+  {{- range $name, $v := $raw -}}
+    {{- if $v -}}
+      {{- $items = $items | append (dict "name" (string $name) "icon" (string $name) "url" (string $v) "qr" (string $v)) -}}
+    {{- end -}}
+  {{- end -}}
+{{- else if reflect.IsSlice $raw -}}
+  {{- range $item := $raw -}}
+    {{- if $item -}}
+      {{- $url := string ($item.url | default "") -}}
+      {{- $qr := string ($item.qr | default "") -}}
+      {{- if or $url $qr -}}
+        {{- $items = $items | append (dict
+          "name" (string ($item.name | default ""))
+          "icon" (string ($item.icon | default ""))
+          "url" $url
+          "qr" $qr) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $items -}}

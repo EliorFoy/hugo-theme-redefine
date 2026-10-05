@@ -22,7 +22,15 @@
     {{- $first := index $args 0 -}}
     {{- if and (gt (len $args) 1) (findRE "^[0-9]+$" (index $args 1)) }}{{ $activeIndex = int (index $args 1) }}{{ end -}}
     {{- if findRE "^[0-9]+$" $first }}{{ $activeIndex = int $first }}
-    {{- else if not (in $first "::") }}{{ $tabName = $first }}{{ end -}}
+    {{- else if in $first "::" }}{{- /* form: name::activeIndex */ -}}
+      {{- $parts := split $first "::" -}}
+      {{- $tabName = strings.TrimSpace (index $parts 0) -}}
+      {{- if and (gt (len $parts) 1) (findRE "^[0-9]+$" (strings.TrimSpace (index $parts 1))) }}{{ $activeIndex = int (strings.TrimSpace (index $parts 1)) }}{{ end -}}
+    {{- else if in $first "," }}{{- /* form: name,activeIndex */ -}}
+      {{- $parts := split $first "," -}}
+      {{- $tabName = strings.TrimSpace (index $parts 0) -}}
+      {{- if and (gt (len $parts) 1) (findRE "^[0-9]+$" (strings.TrimSpace (index $parts 1))) }}{{ $activeIndex = int (strings.TrimSpace (index $parts 1)) }}{{ end -}}
+    {{- else }}{{ $tabName = $first }}{{ end -}}
   {{- end -}}
 {{- end -}}
 

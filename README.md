@@ -112,6 +112,27 @@ expires: 365                   # 可选，过期提醒（天）
 
 旧版 Hexo 标签同样可用：`note`（= 简单 callout）、`notel`/`notelarge`（= 带标题 callout，标题默认 Warning）、`btn`、`cell`、`btns`、`buttons`、`subtabs`、`subsubtabs`。
 
+> 嵌套提示：在 tabs/folding/callout 内部再嵌套短代码时，请使用 `{{%/* tabs %}}`（百分号）形态调用，Hugo 会先渲染内部短代码再传入（`{{</* %}}` 形态下嵌套短代码不会被处理）。
+
+## 数学公式（MathJax/LaTeX）
+
+对应 Hexo 的 hexo-filter-mathjax 插件，Hugo 版使用内置 KaTeX 在**构建期**渲染（无运行时 JS、无闪动）：
+
+1. 站点 `hugo.toml` 中启用 passthrough 扩展（markup 配置无法由主题提供默认值，必须写在站点配置）：
+
+```toml
+[markup.goldmark.extensions.passthrough]
+enable = true
+[markup.goldmark.extensions.passthrough.delimiters]
+inline = [['$', '$'], ['\(', '\)']]
+block = [['\[', '\]'], ['$$', '$$']]
+```
+
+2. 文章 front matter 中 `mathjax: true`（与 Hexo 用法一致）。
+3. 行内公式 `$...$` 或 `\(...\)`，块级公式 `$$...$$` 或 `\[...\]`。
+
+KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。
+
 ## 配置
 
 配置结构与 Hexo 版 `_config.yml` 一致，全部位于 `[params]` 下（`params.info`、`params.colors`、`params.home_banner`……），完整默认值见主题根目录的 [hugo.toml](hugo.toml)。常用项：

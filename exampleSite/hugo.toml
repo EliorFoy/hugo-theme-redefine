@@ -19,6 +19,12 @@ codeFences = true
 noClasses = false
 lineNos = true
 lineNumbersInTable = true
+[markup.goldmark.extensions.passthrough]
+enabled = true
+[markup.goldmark.extensions.passthrough.delimiters]
+inline = [['\(', '\)']]
+block = [['\[', '\]'], ['$$', '$$']]
+
 [markup.goldmark.renderer]
 unsafe = true
 [markup.tableOfContents]

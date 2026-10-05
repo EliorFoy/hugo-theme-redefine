@@ -69,17 +69,17 @@
             {{- if eq $cfg.social_links.style "center" }}{{ $justify = "justify-center" }}{{ end -}}
             {{- $display := "flex" -}}
             {{- if eq $cfg.social_links.style "center" }}{{ $display = "hidden" }}{{ end -}}
-            {{- $links := $cfg.social_links.links | default slice -}}
-            {{- $qrs := $cfg.social_links.qrs | default slice -}}
+            {{- $links := partial "social-links.html" $cfg.social_links.links -}}
+            {{- $qrs := partial "social-links.html" $cfg.social_links.qrs -}}
             {{- $hasQrs := false -}}
-            {{- range $qrs }}{{ if and . (isset . "qr") .qr }}{{ $hasQrs = true }}{{ end }}{{ end -}}
+            {{- range $qrs }}{{ if and . .qr }}{{ $hasQrs = true }}{{ end }}{{ end -}}
             <div class="absolute bottom-0.5 flex {{ $flexDirection }} {{ $justify }} max-w-[1340px] items-center w-full px-8 sm:px-12">
                 <div class="{{ $display }} p-3 bg-gray-300/50 dark:bg-gray-500/40 backdrop-blur-lg border border-white/20 dark:border-gray-500/30 group rounded-full cursor-pointer flex justify-center items-center aspect-square h-full shadow-redefine-flat hover:shadow-redefine-flat-hover transition-shadow" onclick="scrollToMain()" >
                     <i class="fa-solid fa-arrow-down fa-fw fa-lg group-hover:translate-y-1 transition-transform"></i>
                 </div>
                 <div class="social-contacts px-6 py-3 bg-gray-300/50 dark:bg-gray-500/40 backdrop-blur-lg border border-white/20 dark:border-gray-500/30 shadow-redefine-flat rounded-full flex flex-row gap-3 items-center">
                     {{- range $item := $links }}
-                        {{- if and $item (isset $item "url") $item.url }}
+                        {{- if and $item $item.url }}
                             {{- $name := $item.name | default "" -}}
                             {{- $icon := partial "normalize-social-icon.html" (dict "icon" $item.icon "name" $name) -}}
                             {{- $url := $item.url -}}
@@ -120,7 +120,7 @@
                         <div class="social-links-divider vertical-separator w-[1px] h-4 bg-third-text-color mx-0.5"></div>
 
                         {{- range $item := $qrs }}
-                            {{- if and $item (isset $item "qr") $item.qr }}
+                            {{- if and $item $item.qr }}
                                 {{- $name := $item.name | default "" -}}
                                 {{- $icon := partial "normalize-social-icon.html" (dict "icon" $item.icon "name" $name) -}}
                                 {{- $qr := $item.qr -}}

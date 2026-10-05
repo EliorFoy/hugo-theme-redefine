@@ -166,6 +166,10 @@
     <link rel="stylesheet" href="{{ "fonts/GeistMono/geist-mono.css" | relURL }}">
     <link rel="stylesheet" href="{{ "fonts/Geist/geist.css" | relURL }}">
     {{- partial "css-overrides.html" . }}
+{{- if site.Params.plugins.mathjax.enable }}
+<!-- KaTeX CSS for build-time math rendering (mathjax plugin equivalent) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+{{- end }}
     <!--- Font Part-->
     {{- if $theme.home_banner.custom_font.enable }}
     <link href="{{ $theme.home_banner.custom_font.url }}" rel="stylesheet">

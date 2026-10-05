@@ -77,4 +77,55 @@ html, body {
   font-family: '{{ $engFont }}', '{{ $chnFont }}', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif;
 }
 {{- end }}
+{{- /* code block custom font (compiled into CSS by Hexo; overridden here) */ -}}
+{{- if and $theme.articles.code_block.font.enable $theme.articles.code_block.font.family }}
+pre, code {
+  font-family: '{{ $theme.articles.code_block.font.family }}', 'Geist Mono', Courier, monospace !important;
+}
+{{- end }}
+{{- /* code block style = simple (compiled-in mac style is neutralized) */ -}}
+{{- if eq ($theme.articles.code_block.style | default "mac") "simple" }}
+.code-container {
+  background: none;
+  box-shadow: none;
+  padding-top: 0;
+  border-radius: 18px;
+}
+.code-container::before, .code-container::after {
+  display: none;
+}
+{{- end }}
+{{- /* image alignment (center is the compiled default; override other values) */ -}}
+{{- if and $font.image_alignment (ne $font.image_alignment "center") }}
+.markdown-body img:not(.not-markdown) {
+  margin: 1rem 0 1rem;
+}
+{{- end }}
+{{- /* home banner text style */ -}}
+.home-banner-container .content .description {
+  font-size: {{ $theme.home_banner.text_style.title_size | default "2.8rem" }};
+}
+.home-banner-container .content .description p {
+  font-size: {{ $theme.home_banner.text_style.subtitle_size | default "1.4rem" }};
+}
+{{- /* hover effects (shadow=true/scale=false are the compiled defaults) */ -}}
+{{- if eq ($theme.global.hover.shadow | default true) false }}
+.redefine-box-shadow:hover {
+  box-shadow: var(--redefine-box-shadow);
+}
+.redefine-box-shadow-flat:hover {
+  box-shadow: var(--redefine-box-shadow-flat);
+}
+{{- end }}
+{{- if $theme.global.hover.scale }}
+@media (min-width: 640px) {
+  .redefine-box-shadow:hover, .redefine-box-shadow-flat:hover,
+  .page-template-container, .post-page-container .article-content-container .recommended-article .recommended-article-group .recommended-article-item {
+    transition: transform 0.2s linear;
+  }
+  .redefine-box-shadow:hover, .redefine-box-shadow-flat:hover {
+    transform: scale(1.02);
+  }
+}
+{{- end }}
 </style>
