@@ -129,6 +129,7 @@ block = [['\[', '\]'], ['$$', '$$']]
 ```
 
 2. 文章 front matter 中 `mathjax: true`（沿用 Hexo 习惯的键名）。
+3. 从 Hexo 迁移时建议将 permalink 设为 `posts = "/:year/:month/:day/:slugorfilename/"`——`:title` 会基于 front matter title 生成 URL，同标题文章（如同一篇笔记的本地版与发布版）会互相覆盖；`:slugorfilename` 与 Hexo 的"文件名作 URL"行为一致。
 3. 行内公式 `$...$` 或 `\(...\)`，块级公式 `$$...$$` 或 `\[...\]`。
 
 KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。注意：Hugo 内置 KaTeX 引擎输出的 HTML 使用少量改名类（`.katex-base` 等），主题自带 `css/katex-tomath.css` 适配层将其映射回官方 KaTeX CSS 规则——**请勿移除该文件**，否则分式会错位。
