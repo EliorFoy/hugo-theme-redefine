@@ -131,7 +131,7 @@ block = [['\[', '\]'], ['$$', '$$']]
 2. 文章 front matter 中 `mathjax: true`（沿用 Hexo 习惯的键名）。
 3. 行内公式 `$...$` 或 `\(...\)`，块级公式 `$$...$$` 或 `\[...\]`。
 
-KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。
+KaTeX 样式表会在页面包含公式时自动按需加载；中文/Unicode 符号已通过 `strict: ignore` 容错。注意：Hugo 内置 KaTeX 引擎输出的 HTML 使用少量改名类（`.katex-base` 等），主题自带 `css/katex-tomath.css` 适配层将其映射回官方 KaTeX CSS 规则——**请勿移除该文件**，否则分式会错位。
 
 ## 配置
 
