@@ -1,15 +1,12 @@
 {{- /*
-  Math rendering — Hugo equivalent of the hexo-filter-mathjax plugin.
-  Build-time KaTeX via transform.ToMath. Delimiters: $...$, \(...\), \[...\], $$...$$.
-  The KaTeX stylesheet is loaded on demand via the page store (see baseof.html).
+  Math rendering — plugin-form MathJax (client-side), mirroring the
+  hexo-filter-mathjax engine. Passthrough captures the formula, this hook
+  normalizes delimiters ($..$ -> \(..\), $$..$$ and \[..\] -> \[..\]) and
+  the MathJax script (loaded on pages containing math) renders them.
 */ -}}
-{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq .Type "block") "throwOnError" false "strict" "ignore" "trust" true -}}
-{{- with try (transform.ToMath .Inner $opts) -}}
-  {{- with .Err -}}
-    {{- warnf "transform.ToMath failed (%s): %s" . $.Position -}}
-    {{- if eq $.Type "block" }}$${ $.Inner }$${{ else }}$${ $.Inner }${{ end -}}
-  {{- else -}}
-    {{- .Value -}}
-    {{- $.Page.Store.Set "hasMath" true -}}
-  {{- end -}}
+{{- $.Page.Store.Set "hasMath" true -}}
+{{- if eq .Type "block" -}}
+\[{{ .Inner }}\]
+{{- else -}}
+\({{ .Inner }}\)
 {{- end -}}
